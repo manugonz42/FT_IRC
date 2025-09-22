@@ -5,14 +5,15 @@
 class Client
 {
 	private:
-		int	fd;
-		std::string	nick;
-		std::string username;
-		bool authenticated;
+		int	_fd;
+		std::string	_nick;
+		std::string _username;
+		bool _authenticated;
 
 	public:
-		Client();
+		Client(int fd);
 		~Client();
+		int getFd();
 };
 
 #endif

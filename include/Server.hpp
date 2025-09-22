@@ -13,9 +13,8 @@ class Server
 	public:
 		Server(int port, const std::string &password);
 		~Server();
-		void	setPassword(std::string password);
-		void	setPort(int port);
-		void	setFd(int fd);
+		int	getFd();
+		int	socketInit();
 };
 
 #endif

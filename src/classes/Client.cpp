@@ -1,9 +1,16 @@
 #include "../../include/Server.hpp"
 
-Client::Client()
+Client::Client(int fd) : _fd(fd)
 {
-	std::cout << "test Cl" << std::endl;
 }
+
 Client::~Client()
-{	
+{
+	if (_fd > -1)
+		close (_fd);
+}
+
+int Client::getFd()
+{
+	return (_fd);
 }
