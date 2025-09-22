@@ -1,5 +1,9 @@
 NAME = ircserv
-SRC = src/main.cpp
+SRC = src/main.cpp\
+	src/classes/Client.cpp\
+	src/classes/Channel.cpp\
+	src/classes/Server.cpp\
+
 OBJ = $(SRC:.cpp=.o)
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98
@@ -9,6 +13,9 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	$(RM) $(OBJ)
