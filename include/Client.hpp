@@ -5,15 +5,20 @@
 class Client
 {
 	private:
-		int	_fd;
+		int			_fd;
 		std::string	_nick;
-		std::string _username;
-		bool _authenticated;
+		std::string	_username;
+		std::string	_inputBuffer;
+		bool		_authenticated;
+
 
 	public:
 		Client(int fd);
 		~Client();
-		int getFd();
+		int			getFd();
+		void	appendToBuffer(const char *, size_t);
+		void	printBuffer();
+		bool	extractedLine(std::string &line);
 };
 
 #endif
