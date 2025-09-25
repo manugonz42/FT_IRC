@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 		return (1);
 	}
 	
-	Server server(std::atoi(argv[1]), argv[2]);
+	Server	server(std::atoi(argv[1]), argv[2]);
 	if (!server.socketInit())
 		return (1);
 	server.run();

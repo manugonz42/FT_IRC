@@ -8,14 +8,12 @@ Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _p
 
 Server::~Server()
 {
-	size_t i = 0;
-    while (i < _clientList.size()) {
-        delete _clientList[i];
-        ++i;
-    }
-    _clientList.clear();
+	shutdownClients();
 	if (_fd > -1)
+	{
 		close(_fd);
+		_fd = -1;
+	}
 }
 
 int		Server::getFd()
@@ -34,6 +32,25 @@ int		reusePort(int fd)
 	return (0);
 }
 
+//	Prepare the socket and put it into listening mode
+//
+//
+//	socket():
+//		Creates a socket for network communication
+//			AF_INET: For IPv4 address (DOMAIN)
+//			SOCK_STREAM: For TCP connection (TYPE)
+//			0: Tells the kernel that it will use the default protocol for this domain/type
+//	bind():
+//		Associates your socket with a specific local address (IP + port)
+//		After bind(), the OS knows which interface/port your server will use
+//		so it can accept incoming connections on that address
+//			sockaddr_in: a structure that contains the info that bind() needs:
+//				sin_family: Address family 
+//				AF_INET: IPv4
+//				sin_addr.s_addr: is the 32-bit IPv4 address stored in network byte order
+//					INADDR_ANY: Means "accept all local interfaces" (0.0.0.0)
+//	listen():
+//		Puts the socket into listening mode for incoming connections
 int		Server::socketInit()
 {
 	struct sockaddr_in addr;
@@ -64,6 +81,7 @@ int		Server::socketInit()
     return (1);
 }
 
+// Function that accepts a new client
 void Server::acceptNewClient()
 {
 	if (_pollFds[0].revents & POLLIN)
@@ -72,10 +90,9 @@ void Server::acceptNewClient()
 		socklen_t			len = sizeof(addr);
 		int	clientFd = accept(_fd, (struct sockaddr *)&addr, &len);
 		if (clientFd < 0)
-		std::cerr << "Error: accept failed" << std::endl;
+			std::cerr << "Error: accept failed" << std::endl;
 		else
 		{
-			fcntl(clientFd, F_SETFL, O_NONBLOCK);
 			Client *newClient = new Client(clientFd);
 			_clientList.push_back(newClient);
 			struct pollfd clientPoll;
@@ -99,13 +116,14 @@ void Server::removeClient(size_t i)
 
 void Server::shutdownClients()
 {
-	size_t i = 1;
+	size_t	i = 1;
 
 	while (i < _pollFds.size())
 	{
+		size_t	client = i - 1;
 		close(_pollFds[i].fd);
 		_pollFds.erase(_pollFds.begin() + i);
-		removeClient(i - 1);
+		removeClient(client);
 	}
 }
 
@@ -143,16 +161,21 @@ void	Server::handleMsg()
 	
 }
 
-//	- The pollfd struct contains the data that poll() needs.
-//	It has 3 fields:
-//		1) fd: The file descriptor that will be monitored.
-//		2) events:
-//			Bitmask that specifies which events to monitor on the descriptor:
-//				POLLIN: Notifies when data can be read without blocking (e.g., accept ready).
-//				POLLOUT: Notifies when data can be written without blocking.
-//		3) revents: Filled by poll(). This shows the events that actually occurred.
-//	- The push_back function adds a new item to the back of the vector.
-
+//	Server main loop. Waits for sockets to become ready, accept new clients,
+//	reads data from established clients and saves each complete line into the client buffer.
+//	pollfd struct:
+//		Contains the data that poll() needs.
+//		It has 3 fields:
+//			1) fd: The file descriptor that will be monitored.
+//			2) events:
+//				Bitmask that specifies which events to monitor on the descriptor:
+//					POLLIN: Notifies when data can be read without blocking (e.g., accept ready).
+//					POLLOUT: Notifies when data can be written without blocking.
+//			3) revents: Filled by poll(). This shows the events that actually occurred.
+//	poll():
+//		Waits for activity on a set of fds.
+//	**push_back:
+//		Adds a new item to the back of the vector.
 void	Server::run()
 {
 	struct pollfd	serverPoll;
