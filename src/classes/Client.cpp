@@ -3,6 +3,7 @@
 Client::Client(int fd) : _fd(fd)
 {
 	_inputBuffer = "";
+	_authenticated = false;
 }
 
 Client::~Client()
@@ -47,4 +48,13 @@ std::string		Client::getField(const std::string &type)
 		return (_nick);
 	else
 		return (_username);
+}
+
+bool	Client::isAuthenticated()
+{
+	return (_authenticated);
+}
+void		Client::Authenticate()
+{
+	_authenticated = true;
 }

@@ -15,6 +15,7 @@ void	Server::removeClient(size_t i)
 {
 	if (i >= _clientList.size())
 		return;
+	shutdown(_clientList[i]->getFd(), SHUT_WR);
 	delete _clientList[i];
 	_clientList.erase(_clientList.begin() + i);
 }
@@ -78,10 +79,17 @@ void	Server::processClientsInput()
 				removeClient(client);
 				continue;
 			}
+			buffer[bytes] = '\0';
 			_clientList[client]->appendToBuffer(buffer, bytes);
 			while (_clientList[client]->extractedLine(line))
 			{
-				wellcome(_clientList[client], line);
+				if (!wellcome(_clientList[client], line))
+				{
+					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
+					_pollFds.erase(_pollFds.begin() + i);
+					removeClient(client);
+					continue;
+				}
 				std::cout << "Client[" << _clientList[client]->getFd() <<"]: " << line << std::endl;
 			}
 		}

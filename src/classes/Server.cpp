@@ -1,6 +1,5 @@
 #include "../../include/Server.hpp"
 
-
 Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _password(password)
 {
 	_running = true;
@@ -90,23 +89,46 @@ int		Server::socketInit()
 //	comandos o tags adicionales pueden usar
 int		Server::wellcome(Client *client, const std::string &request)
 {
+	std::string newPassword;
+
 	size_t i = 0;
-	if (request == "CAP LS 302")
+	if ((i = request.find("PASS")) != std::string::npos)
+	{
+		newPassword = request.substr(5, request.length());
+		if (newPassword != _password)
+		{
+			sendMessage(client->getFd(), ":best.super.server.ever 464 * :Password incorrect");
+			return (0);
+		}
+		client->Authenticate();
+	}
+	else if (request == "CAP LS 302")
 	{
 		std::cout << "sending handshake..." << std::endl;
 		sendMessage(client->getFd(), ":best.super.server.ever CAP * LS :");
+		sendMessage(client->getFd(), ":best.super.server.ever CAP * END");
 	}
 	else if (request == "JOIN :")
 	{
 		std::cout << "sending join error..." << std::endl;
-		sendMessage(client->getFd(), ":best.super.server.ever 461 * JOIN :Not enough parameters");
+		sendMessage(client->getFd(), ":best.super.server.ever 461 * Not enough parameters");
 	}
 	else if ((i = request.find("NICK")) != std::string::npos)
 	{
-		client->setField("NICK", request.substr(i + 5, request.length()));
+		if (!client->isAuthenticated())
+		{
+			sendMessage(client->getFd(), ":best.super.server.ever 464 * :Password incorrect");
+			return (0);
+		}
+		client->setField("NICK", request.substr(5, request.length()));
 	}
 	else if ((i = request.find("USER")) != std::string::npos)
 	{
+		if (!client->isAuthenticated())
+		{
+			sendMessage(client->getFd(), ":best.super.server.ever 464 * :Password incorrect");
+			return (0);
+		}
 		std::cout << "sending welcome..." << std::endl;
 		sendMessage(client->getFd(), ":best.super.server.ever 001 " + client->getField("NICK") + " :Welcome to the Internet Relay Network " + client->getField("NICK") + "!");
 	}

@@ -18,8 +18,10 @@ class Client
 		int			getFd();
 		void		appendToBuffer(const char *, size_t);
 		bool		extractedLine(std::string &line);
+		std::string	getField(const std::string &type);
+		bool		isAuthenticated();
 		void		setField(const std::string &field, const std::string &nick);
-		std::string		getField(const std::string &type);
+		void		Authenticate();
 };
 
 #endif
