@@ -16,6 +16,9 @@ class Server
 		void						removeClient(size_t i);
 		void						handleMsg();
 		void						shutdownClients();
+		int							sendMessage(int fd ,const std::string &msg);
+		int							wellcome(Client *client ,const std::string &request);
+
 	public:
 		Server(int port, const std::string &password);
 		~Server();

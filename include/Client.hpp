@@ -16,9 +16,10 @@ class Client
 		Client(int fd);
 		~Client();
 		int			getFd();
-		void	appendToBuffer(const char *, size_t);
-		void	printBuffer();
-		bool	extractedLine(std::string &line);
+		void		appendToBuffer(const char *, size_t);
+		bool		extractedLine(std::string &line);
+		void		setField(const std::string &field, const std::string &nick);
+		std::string		getField(const std::string &type);
 };
 
 #endif

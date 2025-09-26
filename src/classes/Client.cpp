@@ -21,11 +21,6 @@ void	Client::appendToBuffer(const char *chunk, size_t bytes)
 	_inputBuffer.append(chunk, bytes);
 }
 
-void	Client::printBuffer()
-{
-	std::cout << _inputBuffer << std::endl;
-}
-
 bool	Client::extractedLine(std::string &line)
 {
 	size_t	pos;
@@ -36,4 +31,20 @@ bool	Client::extractedLine(std::string &line)
 	line = _inputBuffer.substr(0, pos);
 	_inputBuffer.erase(0, pos + 2);
 	return (true);
+}
+
+void	Client::setField(const std::string &type, const std::string &field)
+{
+	if (type == "NICK")
+		_nick = field;
+	if (type == "USER")
+		_username = field;
+}
+
+std::string		Client::getField(const std::string &type)
+{
+	if (type == "NICK")
+		return (_nick);
+	else
+		return (_username);
 }

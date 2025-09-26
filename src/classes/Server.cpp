@@ -127,6 +127,49 @@ void Server::shutdownClients()
 	}
 }
 
+int	Server::sendMessage(int fd ,const std::string &msg)
+{
+	std::string	wire = msg + "\r\n";
+	if (::send(fd, wire.c_str(), wire.size(), 0) == -1)
+	{
+		std::cerr << "Error: send failed" << std::endl;
+		return (0);
+	}
+	return (1);
+}
+
+//	This is only provisional!
+//	Must give a name to our server!
+int		Server::wellcome(Client *client, const std::string &request)
+{
+	size_t i = 0;
+	if (request == "CAP LS 302")
+	{
+		std::cout << "sending handshake..." << std::endl;
+		sendMessage(client->getFd(), ":best.super.server.ever CAP * LS :");
+	}
+	else if (request == "JOIN :")
+	{
+		std::cout << "sending join error..." << std::endl;
+		sendMessage(client->getFd(), ":best.super.server.ever 461 * JOIN :Not enough parameters");
+	}
+	else if ((i = request.find("NICK")) != std::string::npos)
+	{
+		client->setField("NICK", request.substr(i + 5, request.length()));
+	}
+	else if ((i = request.find("USER")) != std::string::npos)
+	{
+		client->setField("USER", "\"username\"");
+		std::cout << "sending welcome..." << std::endl;
+		sendMessage(client->getFd(), ":best.super.server.ever 001 " + client->getField("NICK") + " :Welcome to the Internet Relay Network!");
+	}
+	return (1);
+}
+//	Las “capabilities” (o “caps”) son un mecanismo de IRCv3 que permite negociar
+//	funciones opcionales entre cliente y servidor antes de completar el registro.
+//	El cliente envía CAP para preguntar qué extensiones soporta el servidor,
+//	activar o desactivar algunas y, en base a eso, ambos lados saben qué
+//	comandos o tags adicionales pueden usar
 void	Server::handleMsg()
 {
 	char		buffer[512];
@@ -152,6 +195,7 @@ void	Server::handleMsg()
 			_clientList[client]->appendToBuffer(buffer, bytes);
 			while (_clientList[client]->extractedLine(line))
 			{
+				wellcome(_clientList[client], line);
 				std::cout << "Client[" << _clientList[client]->getFd() <<"]: " << line << std::endl;
 			}
 		}
