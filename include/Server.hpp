@@ -14,7 +14,7 @@ class Server
 		std::vector<Channel *>		_channelList;
 		void						acceptNewClient();
 		void						removeClient(size_t i);
-		void						handleMsg();
+		void						processClientsInput();
 		void						shutdownClients();
 		int							sendMessage(int fd ,const std::string &msg);
 		int							wellcome(Client *client ,const std::string &request);

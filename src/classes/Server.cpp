@@ -81,65 +81,13 @@ int		Server::socketInit()
     return (1);
 }
 
-// Function that accepts a new client
-void Server::acceptNewClient()
-{
-	if (_pollFds[0].revents & POLLIN)
-	{
-		struct sockaddr_in	addr;
-		socklen_t			len = sizeof(addr);
-		int	clientFd = accept(_fd, (struct sockaddr *)&addr, &len);
-		if (clientFd < 0)
-			std::cerr << "Error: accept failed" << std::endl;
-		else
-		{
-			Client *newClient = new Client(clientFd);
-			_clientList.push_back(newClient);
-			struct pollfd clientPoll;
-			clientPoll.fd = newClient->getFd();
-			clientPoll.events = POLLIN;
-			clientPoll.revents = 0;
-			_pollFds.push_back(clientPoll);
-			
-			std::cout << "Client connected: " << newClient->getFd() << std::endl;
-		}
-	}
-}
-
-void Server::removeClient(size_t i)
-{
-	if (i >= _clientList.size())
-		return;
-	delete _clientList[i];
-	_clientList.erase(_clientList.begin() + i);
-}
-
-void Server::shutdownClients()
-{
-	size_t	i = 1;
-
-	while (i < _pollFds.size())
-	{
-		size_t	client = i - 1;
-		close(_pollFds[i].fd);
-		_pollFds.erase(_pollFds.begin() + i);
-		removeClient(client);
-	}
-}
-
-int	Server::sendMessage(int fd ,const std::string &msg)
-{
-	std::string	wire = msg + "\r\n";
-	if (::send(fd, wire.c_str(), wire.size(), 0) == -1)
-	{
-		std::cerr << "Error: send failed" << std::endl;
-		return (0);
-	}
-	return (1);
-}
-
 //	This is only provisional!
 //	Must give a name to our server!
+//	Las “capabilities” (o “caps”) son un mecanismo de IRCv3 que permite negociar
+//	funciones opcionales entre cliente y servidor antes de completar el registro.
+//	El cliente envía CAP para preguntar qué extensiones soporta el servidor,
+//	activar o desactivar algunas y, en base a eso, ambos lados saben qué
+//	comandos o tags adicionales pueden usar
 int		Server::wellcome(Client *client, const std::string &request)
 {
 	size_t i = 0;
@@ -159,50 +107,10 @@ int		Server::wellcome(Client *client, const std::string &request)
 	}
 	else if ((i = request.find("USER")) != std::string::npos)
 	{
-		client->setField("USER", "\"username\"");
 		std::cout << "sending welcome..." << std::endl;
-		sendMessage(client->getFd(), ":best.super.server.ever 001 " + client->getField("NICK") + " :Welcome to the Internet Relay Network!");
+		sendMessage(client->getFd(), ":best.super.server.ever 001 " + client->getField("NICK") + " :Welcome to the Internet Relay Network " + client->getField("NICK") + "!");
 	}
 	return (1);
-}
-//	Las “capabilities” (o “caps”) son un mecanismo de IRCv3 que permite negociar
-//	funciones opcionales entre cliente y servidor antes de completar el registro.
-//	El cliente envía CAP para preguntar qué extensiones soporta el servidor,
-//	activar o desactivar algunas y, en base a eso, ambos lados saben qué
-//	comandos o tags adicionales pueden usar
-void	Server::handleMsg()
-{
-	char		buffer[512];
-	std::string	line;
-	size_t		i = 1;
-	
-	while (i < _pollFds.size())
-	{
-		size_t	client = i - 1;
-		short	revents = _pollFds[i].revents;
-		if (revents & (POLLERR | POLLHUP | POLLNVAL))
-		revents |= POLLIN;
-		if (revents & POLLIN)
-		{
-			int	bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
-			if (bytes <= 0)
-			{
-				std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
-				_pollFds.erase(_pollFds.begin() + i);
-				removeClient(client);
-				continue;
-			}
-			_clientList[client]->appendToBuffer(buffer, bytes);
-			while (_clientList[client]->extractedLine(line))
-			{
-				wellcome(_clientList[client], line);
-				std::cout << "Client[" << _clientList[client]->getFd() <<"]: " << line << std::endl;
-			}
-		}
-		_pollFds[i].revents = 0;
-		i++;
-	}
-	
 }
 
 //	Server main loop. Waits for sockets to become ready, accept new clients,
@@ -240,7 +148,7 @@ void	Server::run()
 			break;
 		}
 		acceptNewClient();
-		handleMsg();
+		processClientsInput();
 	}
 }
 
