@@ -103,16 +103,9 @@ int		Server::wellcome(Client *client, const std::string &request)
 		client->Authenticate();
 	}
 	else if (request == "CAP LS 302")
-	{
-		std::cout << "sending handshake..." << std::endl;
 		sendMessage(client->getFd(), ":best.super.server.ever CAP * LS :");
-		sendMessage(client->getFd(), ":best.super.server.ever CAP * END");
-	}
 	else if (request == "JOIN :")
-	{
-		std::cout << "sending join error..." << std::endl;
-		sendMessage(client->getFd(), ":best.super.server.ever 461 * Not enough parameters");
-	}
+		sendMessage(client->getFd(), ":best.super.server.ever 461 *");
 	else if ((i = request.find("NICK")) != std::string::npos)
 	{
 		if (!client->isAuthenticated())
@@ -129,7 +122,6 @@ int		Server::wellcome(Client *client, const std::string &request)
 			sendMessage(client->getFd(), ":best.super.server.ever 464 * :Password incorrect");
 			return (0);
 		}
-		std::cout << "sending welcome..." << std::endl;
 		sendMessage(client->getFd(), ":best.super.server.ever 001 " + client->getField("NICK") + " :Welcome to the Internet Relay Network " + client->getField("NICK") + "!");
 	}
 	return (1);

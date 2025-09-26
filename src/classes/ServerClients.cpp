@@ -88,7 +88,7 @@ void	Server::processClientsInput()
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 					_pollFds.erase(_pollFds.begin() + i);
 					removeClient(client);
-					continue;
+					break;
 				}
 				std::cout << "Client[" << _clientList[client]->getFd() <<"]: " << line << std::endl;
 			}
