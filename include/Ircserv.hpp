@@ -19,4 +19,11 @@
 # include "Server.hpp"
 
 
+typedef enum e_command
+{
+	ADD,
+	USER,
+	JOIN
+}	t_command;
+
 #endif

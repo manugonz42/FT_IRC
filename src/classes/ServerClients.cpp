@@ -83,6 +83,7 @@ void	Server::processClientsInput()
 			_clientList[client]->appendToBuffer(buffer, bytes);
 			while (_clientList[client]->extractedLine(line))
 			{
+			//	ejecutarComando()
 				if (!wellcome(_clientList[client], line))
 				{
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
@@ -97,3 +98,19 @@ void	Server::processClientsInput()
 		i++;
 	}
 }
+/*
+ejecutarComando(cliente, std::string line)
+{
+	palabra;
+	for (int i = 0; i < size; i++)
+	{
+		if (palabra == enum[i])
+			if (!PASS && !client->isAuthenticated())
+			{
+				sendMessage(client->getFd(), ":best.super.server.ever 464 * :Password incorrect");
+				return (0);
+			}
+			ejecuto(i)
+			break;
+	}
+}*/

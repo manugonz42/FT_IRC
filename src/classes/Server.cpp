@@ -127,6 +127,7 @@ int		Server::wellcome(Client *client, const std::string &request)
 	return (1);
 }
 
+
 //	Server main loop. Waits for sockets to become ready, accept new clients,
 //	reads data from established clients and saves each complete line into the client buffer.
 //	pollfd struct:
