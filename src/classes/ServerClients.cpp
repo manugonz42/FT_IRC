@@ -83,6 +83,8 @@ void	Server::processClientsInput()
 			_clientList[client]->appendToBuffer(buffer, bytes);
 			while (_clientList[client]->extractedLine(line))
 			{
+			//	if (line == "CAP LS 302")
+			//		sendMessage(_clientList[client]->getFd(), ":best.super.server.ever CAP * LS :");
 			//	ejecutarComando()
 				if (!wellcome(_clientList[client], line))
 				{
@@ -110,7 +112,14 @@ ejecutarComando(cliente, std::string line)
 				sendMessage(client->getFd(), ":best.super.server.ever 464 * :Password incorrect");
 				return (0);
 			}
-			ejecuto(i)
+			_commandos[i](cliente, line);
 			break;
 	}
-}*/
+}
+
+ejecutarNick(cliente, std::string line)
+{
+	
+}
+
+*/

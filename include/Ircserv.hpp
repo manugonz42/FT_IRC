@@ -21,7 +21,7 @@
 
 typedef enum e_command
 {
-	ADD,
+	PRIVMSG,
 	USER,
 	JOIN
 }	t_command;
