@@ -3,6 +3,7 @@
 Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _password(password)
 {
 	_running = true;
+	_serverName = ":server";
 }
 
 Server::~Server()

@@ -9,6 +9,7 @@ class Server
 {
 	private:
 		bool						_running;
+		std::string					_serverName;
 		int							_fd;
 		int							_port;
 		std::string					_password;

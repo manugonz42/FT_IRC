@@ -128,8 +128,6 @@ void	Server::processClientsInput()
 // processCommand para testing del parser
 bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 {
-	std::cout << "Processing command: " << cmd.command << " from client " << client->getFd() << std::endl;
-	
 	// Imprimir parámetros para debugging
 	for (size_t i = 0; i < cmd.params.size(); ++i) {
 		std::cout << "  Param[" << i << "]: '" << cmd.params[i] << "'" << std::endl;
@@ -174,8 +172,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			std::string nick = client->getField("NICK");
 			sendMessage(client->getFd(), ":server 001 " + nick + " :Welcome to the IRC Network " + nick + "!");
 			sendMessage(client->getFd(), ":server 002 " + nick + " :Your host is server, running version 1.0");
-			sendMessage(client->getFd(), ":server 003 " + nick + " :This server was created today");
-			sendMessage(client->getFd(), ":server 004 " + nick + " server 1.0 o o");
+			sendMessage(client->getFd(), ":server 004 " + nick + " server 1.0");
 			
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
 		} else if (!client->isAuthenticated()) {

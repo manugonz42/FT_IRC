@@ -22,9 +22,9 @@
 
 #define VALID_IRC_COMMANDS \
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", \
-    "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME"
+    "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME", "MODE"
 
-#define VALID_IRC_COMMANDS_COUNT 13
+#define VALID_IRC_COMMANDS_COUNT 14
 
 typedef enum e_command
 {
