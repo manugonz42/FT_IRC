@@ -23,6 +23,24 @@ class Server
 		bool						processCommand(Client *client, const ParsedCommand &cmd);
 		int							wellcome(Client *client ,const std::string &request);  // Método original mantenido
 
+
+		bool						executePingPong(Client *client, const ParsedCommand &cmd);
+		bool						executePass(Client *client, const ParsedCommand &cmd);
+		bool						executeCap(Client *client, const ParsedCommand &cmd);
+		bool						executeNick(Client *client, const ParsedCommand &cmd);
+		bool						executeUser(Client *client, const ParsedCommand &cmd);
+		bool						executeJoin(Client *client, const ParsedCommand &cmd);
+		bool						executePart(Client *client, const ParsedCommand &cmd);
+		bool						executeKick(Client *client, const ParsedCommand &cmd);
+		bool						executeInvite(Client *client, const ParsedCommand &cmd);
+		bool						executeTopic(Client *client, const ParsedCommand &cmd);
+		bool						executePrivMsg(Client *client, const ParsedCommand &cmd);
+		bool						executeNotice(Client *client, const ParsedCommand &cmd);
+		bool						executeQuit(Client *client, const ParsedCommand &cmd);
+		bool						executeVersion(Client *client, const ParsedCommand &cmd);
+		bool						executeTime(Client *client, const ParsedCommand &cmd);
+		bool						executeMode(Client *client, const ParsedCommand &cmd);
+
 	public:
 		Server(int port, const std::string &password);
 		~Server();
