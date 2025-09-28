@@ -4,6 +4,9 @@ Client::Client(int fd) : _fd(fd)
 {
 	_inputBuffer = "";
 	_authenticated = false;
+	_nick = "*";
+	_username = "";
+	_realname = "";
 }
 
 Client::~Client()
