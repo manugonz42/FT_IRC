@@ -125,10 +125,10 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	if (cmd.command == "CAP") {
 		if (cmd.params.size() >= 2 && cmd.params[1] == "LS") {
 			// Responder a CAP LS - no ofrecemos capabilities
-			sendMessage(client->getFd(), ":server CAP * LS :");
+			sendMessage(client->getFd(), "CAP * LS :");
 		} else if (cmd.params.size() >= 2 && cmd.params[1] == "END") {
 			// Cliente termina negociación de capabilities
-			sendMessage(client->getFd(), ":server CAP * ACK :");
+			sendMessage(client->getFd(), "CAP * ACK :");
 		}
 	}
 	else if (cmd.command == "PASS") {
@@ -138,7 +138,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 				client->Authenticate();
 				std::cout << "Client " << client->getFd() << " authenticated" << std::endl;
 			} else {
-				sendMessage(client->getFd(), ":server 464 * :Password incorrect");
+				sendMessage(client->getFd(), "464 * :Password incorrect");
 				return false; // Desconectar
 			}
 		}
@@ -158,17 +158,17 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			
 			// Enviar welcome messages
 			std::string nick = client->getField("NICK");
-			sendMessage(client->getFd(), ":server 001 " + nick + " :Welcome to the IRC Network " + nick + "!");
-			sendMessage(client->getFd(), ":server 002 " + nick + " :Your host is server, running version 1.0");
-			sendMessage(client->getFd(), ":server 004 " + nick + " server 1.0");
+			sendMessage(client->getFd(), "001 " + nick + " :Welcome to the IRC Network " + nick + "!");
+			sendMessage(client->getFd(), "002 " + nick + " :Your host is server, running version 1.0");
+			sendMessage(client->getFd(), "004 " + nick + " server 1.0");
 			
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
 		} else if (!client->isAuthenticated()) {
-			sendMessage(client->getFd(), ":server 464 * :Password incorrect");
+			sendMessage(client->getFd(), "464 * :Password incorrect");
 		}
 	}
 	else if (cmd.command == "PING")
-		sendMessage(client->getFd(), ":server PONG " + cmd.params[1]);
+		sendMessage(client->getFd(), "PONG " + cmd.params[1]);
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar
@@ -178,7 +178,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 }
 
 /*
-ejecutarComando(cliente, std::string line)
+ejecutarComando(Client *client, const ParsedCommand &cmd)
 {
 	palabra;
 	for (int i = 0; i < size; i++)
