@@ -2,6 +2,9 @@
 #define SERVER_HPP
 #include "Ircserv.hpp"
 
+// Forward declaration para evitar dependencia circular
+struct ParsedCommand;
+
 class Server
 {
 	private:
@@ -17,7 +20,8 @@ class Server
 		void						processClientsInput();
 		void						shutdownClients();
 		int							sendMessage(int fd ,const std::string &msg);
-		int							wellcome(Client *client ,const std::string &request);
+		bool						processCommand(Client *client, const ParsedCommand &cmd);
+		int							wellcome(Client *client ,const std::string &request);  // Método original mantenido
 
 	public:
 		Server(int port, const std::string &password);

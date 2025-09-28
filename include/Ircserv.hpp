@@ -14,16 +14,33 @@
 # include <stdio.h>
 # include <cstdlib>
 # include <fcntl.h>
+# include "Structures.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
+# include "Parser.hpp"
 # include "Server.hpp"
 
+#define VALID_IRC_COMMANDS \
+    "CAP", "PASS", "NICK", "USER", "JOIN", "PART", \
+    "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME"
+
+#define VALID_IRC_COMMANDS_COUNT 13
 
 typedef enum e_command
 {
-	PRIVMSG,
-	USER,
-	JOIN
+	CAP,
+	PASS,
+    NICK,
+    USER,
+    JOIN,
+    PART,
+    PRIVMSG,
+    NOTICE,
+    QUIT,
+    PING,
+    PONG,
+    VERSION,
+    TIME,
 }	t_command;
 
 #endif

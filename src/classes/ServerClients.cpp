@@ -1,4 +1,5 @@
 #include "../../include/Server.hpp"
+#include "../../include/Parser.hpp"
 
 int	Server::sendMessage(int fd ,const std::string &msg)
 {
@@ -83,6 +84,28 @@ void	Server::processClientsInput()
 			_clientList[client]->appendToBuffer(buffer, bytes);
 			while (_clientList[client]->extractedLine(line))
 			{
+				// IMPLEMENTACIÓN CON PARSER
+				ParsedCommand cmd = Parser::parse(line);
+				
+				if (!cmd.isValid) {
+					std::cout << "Invalid message from client[" << _clientList[client]->getFd() << "]: " << line << std::endl;
+					continue; // Ignorar mensajes inválidos
+				}
+				// Aquí se procesaría el comando válido
+
+				std::cout << "Client[" << _clientList[client]->getFd() << "] -> " << cmd.command;
+				if (!cmd.params.empty()) {
+					std::cout << " (params: " << cmd.params.size() << ")";
+				}
+				std::cout << std::endl;
+				if (!processCommand(_clientList[client], cmd)) {
+					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
+					_pollFds.erase(_pollFds.begin() + i);
+					removeClient(client);
+					break;
+				}
+				// IMPLEMENTACIÓN ANTERIOR 
+				/*
 			//	if (line == "CAP LS 302")
 			//		sendMessage(_clientList[client]->getFd(), ":best.super.server.ever CAP * LS :");
 			//	ejecutarComando()
@@ -94,12 +117,79 @@ void	Server::processClientsInput()
 					break;
 				}
 				std::cout << "Client[" << _clientList[client]->getFd() <<"]: " << line << std::endl;
+				*/
 			}
 		}
 		_pollFds[i].revents = 0;
 		i++;
 	}
 }
+
+// processCommand para testing del parser
+bool Server::processCommand(Client *client, const ParsedCommand &cmd)
+{
+	std::cout << "Processing command: " << cmd.command << " from client " << client->getFd() << std::endl;
+	
+	// Imprimir parámetros para debugging
+	for (size_t i = 0; i < cmd.params.size(); ++i) {
+		std::cout << "  Param[" << i << "]: '" << cmd.params[i] << "'" << std::endl;
+	}
+	
+	// Manejar comandos básicos para irssi
+	if (cmd.command == "CAP") {
+		if (cmd.params.size() >= 2 && cmd.params[1] == "LS") {
+			// Responder a CAP LS - no ofrecemos capabilities
+			sendMessage(client->getFd(), ":server CAP * LS :");
+		} else if (cmd.params.size() >= 2 && cmd.params[1] == "END") {
+			// Cliente termina negociación de capabilities
+			sendMessage(client->getFd(), ":server CAP * ACK :");
+		}
+	}
+	else if (cmd.command == "PASS") {
+		if (cmd.params.size() >= 2) {
+			std::string password = cmd.params[1];
+			if (password == _password) {
+				client->Authenticate();
+				std::cout << "Client " << client->getFd() << " authenticated" << std::endl;
+			} else {
+				sendMessage(client->getFd(), ":server 464 * :Password incorrect");
+				return false; // Desconectar
+			}
+		}
+	}
+	else if (cmd.command == "NICK") {
+		if (cmd.params.size() >= 2) {
+			std::string nick = cmd.params[1];
+			client->setField("NICK", nick);
+			std::cout << "Client " << client->getFd() << " set nick: " << nick << std::endl;
+		}
+	}
+	else if (cmd.command == "USER") {
+		if (cmd.params.size() >= 5 && client->isAuthenticated()) {
+			std::string username = cmd.params[1];
+			std::string realname = cmd.params[4]; // :Real Name
+			client->setField("USER", username);
+			
+			// Enviar welcome messages
+			std::string nick = client->getField("NICK");
+			sendMessage(client->getFd(), ":server 001 " + nick + " :Welcome to the IRC Network " + nick + "!");
+			sendMessage(client->getFd(), ":server 002 " + nick + " :Your host is server, running version 1.0");
+			sendMessage(client->getFd(), ":server 003 " + nick + " :This server was created today");
+			sendMessage(client->getFd(), ":server 004 " + nick + " server 1.0 o o");
+			
+			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
+		} else if (!client->isAuthenticated()) {
+			sendMessage(client->getFd(), ":server 464 * :Password incorrect");
+		}
+	}
+	else if (cmd.command == "QUIT") {
+		std::cout << "Client " << client->getFd() << " quit" << std::endl;
+		return false; // Desconectar
+	}
+	
+	return true; // Mantener conexión
+}
+
 /*
 ejecutarComando(cliente, std::string line)
 {

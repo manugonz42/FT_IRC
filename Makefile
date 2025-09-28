@@ -3,11 +3,12 @@ SRC = src/main.cpp\
 	src/classes/Client.cpp\
 	src/classes/Server.cpp\
 	src/classes/ServerClients.cpp\
+	src/classes/Parser.cpp\
 # 	src/classes/Channel.cpp\
 
 OBJ = $(SRC:.cpp=.o)
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinclude
 RM = rm -f
 
 all: $(NAME)
