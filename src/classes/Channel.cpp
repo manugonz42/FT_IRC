@@ -1,4 +1,4 @@
-#include "../../include/Server.hpp"
+#include "Ircserv.hpp"
 
 Channel::Channel()
 {

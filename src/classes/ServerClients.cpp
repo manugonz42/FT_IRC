@@ -1,5 +1,4 @@
-#include "../../include/Server.hpp"
-#include "../../include/Parser.hpp"
+#include "Ircserv.hpp"
 
 int	Server::sendMessage(int fd ,const std::string &msg)
 {
@@ -179,6 +178,8 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			sendMessage(client->getFd(), ":server 464 * :Password incorrect");
 		}
 	}
+	else if (cmd.command == "PING")
+		sendMessage(client->getFd(), ":server PONG " + cmd.params[1]);
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar

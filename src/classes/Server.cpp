@@ -1,4 +1,4 @@
-#include "../../include/Server.hpp"
+#include "Ircserv.hpp"
 
 Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _password(password)
 {

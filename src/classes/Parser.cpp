@@ -1,4 +1,4 @@
-#include "../include/Parser.hpp"
+#include "Ircserv.hpp"
 
 // Constructor privado - no implementado para prevenir instanciación
 Parser::Parser() {}
