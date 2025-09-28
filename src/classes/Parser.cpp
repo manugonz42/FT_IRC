@@ -21,7 +21,7 @@ ParsedCommand Parser::parse(const std::string& rawMessage)
 	}
 	
 	// Eliminar prefix si existe 
-	std::string cleaned = removePrefix(trimmed);
+	std::string cleaned = removePrefix(trimmed, result);
 	if (cleaned.empty()) {
 		result.isValid = false;
 		return result;
@@ -143,7 +143,8 @@ std::string Parser::trim(const std::string& str)
 }
 
 // Elimina el prefix IRC si existe (formato :prefix COMMAND params)
-std::string Parser::removePrefix(const std::string& message)
+// y guarda el prefix en la estructura ParsedCommand
+std::string Parser::removePrefix(const std::string& message, ParsedCommand& result)
 {
 	// Si no empieza con ':', no hay prefix
 	if (message[0] != ':')
@@ -153,6 +154,9 @@ std::string Parser::removePrefix(const std::string& message)
 	size_t spacePos = message.find_first_of(" \t\r\n");
 	if (spacePos == std::string::npos)
 		return ""; // Solo hay prefix, no hay comando
+	
+	// Extraer y guardar el prefix (sin los dos puntos)
+	result.prefix = message.substr(1, spacePos - 1);
 	
 	// Saltar todos los whitespace después del prefix
 	size_t start = message.find_first_not_of(" \t\r\n", spacePos);

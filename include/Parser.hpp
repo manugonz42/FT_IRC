@@ -26,7 +26,7 @@ class Parser
 		// Funciones auxiliares
 		static std::vector<std::string>	tokenize(const std::string& message);
 		static std::string			trim(const std::string& str);
-		static std::string			removePrefix(const std::string& message);
+		static std::string			removePrefix(const std::string& message, ParsedCommand& result);
 		static bool					hasValidFormat(const std::string& message);
 };
 
