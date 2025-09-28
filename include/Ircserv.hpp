@@ -19,6 +19,7 @@
 # include "Channel.hpp"
 # include "Parser.hpp"
 # include "Server.hpp"
+# include "commands.hpp"
 
 #define VALID_IRC_COMMANDS \
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", \
@@ -42,5 +43,7 @@ typedef enum e_command
     VERSION,
     TIME,
 }	t_command;
+
+int	sendMessage(int fd ,const std::string &msg);
 
 #endif

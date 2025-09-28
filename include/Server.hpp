@@ -20,7 +20,6 @@ class Server
 		void						removeClient(size_t i);
 		void						processClientsInput();
 		void						shutdownClients();
-		int							sendMessage(int fd ,const std::string &msg);
 		bool						processCommand(Client *client, const ParsedCommand &cmd);
 		int							wellcome(Client *client ,const std::string &request);  // Método original mantenido
 
