@@ -24,7 +24,7 @@
 #define PREFIX ":server "
 
 #define VALID_IRC_COMMANDS \
-    "CAP", "PASS", "NICK", "USER", "JOIN", "PART", \
+    "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
     "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME", "MODE"
 
 #define VALID_IRC_COMMANDS_COUNT 14
