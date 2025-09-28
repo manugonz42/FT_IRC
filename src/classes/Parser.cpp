@@ -34,31 +34,30 @@ ParsedCommand Parser::parse(const std::string& rawMessage)
 		return result;
 	}
 	
-	// 5. Validar que el comando sea válido
+	// Validar que el comando sea válido
 	if (!isValidCommand(command)) {
 		result.isValid = false;
 		return result;
 	}
 	
-	// 6. Tokenizar el mensaje completo (pasamos cleaned)
+	// Tokenizar el mensaje completo (pasamos cleaned)
 	std::vector<std::string> tokens = tokenize(cleaned);
 	
-	// 7. Llenar la estructura resultado
+	// Llenar la estructura resultado
 	result.command = command;
 	result.params = tokens;
-	// TODO: Extraer prefix original si es necesario guardarlo
+
 	result.isValid = true;
 	
 	return result;
 }
 
-// Valida si un comando es válido según el protocolo IRC
+// Valida si un comando es válido
 bool Parser::isValidCommand(const std::string& command)
 {
-	// Array usando la macro centralizada
+	// Comparar contra la lista de comandos válidos
 	static const char* VALID_COMMANDS[] = { VALID_IRC_COMMANDS };
 	
-	// Bucle compatible con C++98
 	for (size_t i = 0; i < VALID_IRC_COMMANDS_COUNT; ++i) {
 		if (command == VALID_COMMANDS[i])
 			return true;
@@ -66,8 +65,8 @@ bool Parser::isValidCommand(const std::string& command)
 	return false;
 }
 
-// Valida si todo el mensaje tiene un formato correcto
-bool Parser::isValidMessage(const std::string& message)
+// Para comandos, intentar unificar enviando requisitos
+bool Parser::isValidMessage(const std::string& message) //
 {
 	(void)message;  // Evitar warning unused parameter
 	// TODO: Implementar validación del formato completo del mensaje
@@ -78,7 +77,7 @@ bool Parser::isValidMessage(const std::string& message)
 	return false;
 }
 
-// Extrae solo el comando de un mensaje IRC (primer filtro)
+// Extrae solo el comando de un mensaje IRC
 std::string Parser::extractCommand(const std::string& message)
 {
 	// Encontrar el final de la primera palabra (el comando)
@@ -99,7 +98,7 @@ std::vector<std::string> Parser::tokenize(const std::string& message)
 {
 	// TODO: Implementar tokenización
 	// - Dividir por espacios
-	// - Manejar parámetros que empiecen con ':' (trailing parameter)
+	// - Manejar parámetros que empiecen con ':' (trailing parameter, siempre el ultimo)
 	// - Mantener espacios dentro del trailing parameter
 	std::vector<std::string> tokens;
 	size_t pos = 0;
