@@ -7,7 +7,6 @@ bool	Server::executePingPong(Client *client, const ParsedCommand &cmd)
 		sendMessage(client->getFd(), "409 " + client->getField("NICK") + " :No origin specified");
 		return (false);
 	}
-	std::cout << "Sending: " << "PONG " + cmd.params[1] << std::endl;
 	sendMessage(client->getFd(), "PONG " + cmd.params[1]);
 	return (true);
 }

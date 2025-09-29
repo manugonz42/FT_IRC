@@ -14,6 +14,7 @@
 # include <stdio.h>
 # include <cstdlib>
 # include <fcntl.h>
+# include <map>
 # include "Structures.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
@@ -25,9 +26,9 @@
 
 #define VALID_IRC_COMMANDS \
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
-    "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME", "MODE"
+    "PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "TIME", "MODE"
 
-#define VALID_IRC_COMMANDS_COUNT 14
+#define VALID_IRC_COMMANDS_COUNT 16
 
 typedef enum e_command
 {
