@@ -1,6 +1,7 @@
+
 #include "Ircserv.hpp"
 
-bool	executePingPong(Client *client, const ParsedCommand &cmd)
+bool	Server::executePingPong(Client *client, const ParsedCommand &cmd)
 {
 	if (cmd.params.size() < 2)
 	{

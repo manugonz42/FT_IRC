@@ -4,6 +4,7 @@
 # include <vector>
 # include <iostream>
 # include <csignal>
+# include <cctype>
 # include <sys/signal.h>
 # include <sys/socket.h>
 # include <sys/poll.h>
@@ -30,6 +31,16 @@
 
 #define VALID_IRC_COMMANDS_COUNT 16
 
+enum LoginStatus
+{
+    UNREGISTERED,   // Recién conectado
+    PASS_SENT,      // Contraseña enviada
+    NICK_SENT,      // Nickname enviado  
+    USER_SENT,      // Usuario enviado (NUEVO)
+    REGISTERED      // Login completo
+};
+#define VALID_IRC_COMMANDS_COUNT 16
+
 typedef enum e_command
 {
 	CAP,
@@ -48,5 +59,5 @@ typedef enum e_command
 }	t_command;
 
 int	sendMessage(int fd ,const std::string &msg);
-
+int	sendNumeric(Client *client, int numeric, const std::string &target);
 #endif
