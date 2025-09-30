@@ -9,19 +9,39 @@ class Server
 {
 	private:
 		bool						_running;
+		std::string					_serverName;
 		int							_fd;
 		int							_port;
 		std::string					_password;
 		std::vector<struct pollfd>	_pollFds;
 		std::vector<Client *>		_clientList;
-		// std::vector<Channel *>		_channelList;
+		std::map<std::string, Client *>	_clientMap;
+		std::map<std::string, Channel *> _channelMap;
+
 		void						acceptNewClient();
 		void						removeClient(size_t i);
 		void						processClientsInput();
 		void						shutdownClients();
-		int							sendMessage(int fd ,const std::string &msg);
 		bool						processCommand(Client *client, const ParsedCommand &cmd);
 		int							wellcome(Client *client ,const std::string &request);  // Método original mantenido
+
+
+		bool						executePingPong(Client *client, const ParsedCommand &cmd);
+		bool						executePass(Client *client, const ParsedCommand &cmd);
+		bool						executeCap(Client *client, const ParsedCommand &cmd);
+		bool						executeNick(Client *client, const ParsedCommand &cmd);
+		bool						executeUser(Client *client, const ParsedCommand &cmd);
+		bool						executeJoin(Client *client, const ParsedCommand &cmd);
+		bool						executePart(Client *client, const ParsedCommand &cmd);
+		bool						executeKick(Client *client, const ParsedCommand &cmd);
+		bool						executeInvite(Client *client, const ParsedCommand &cmd);
+		bool						executeTopic(Client *client, const ParsedCommand &cmd);
+		bool						executePrivMsg(Client *client, const ParsedCommand &cmd);
+		bool						executeNotice(Client *client, const ParsedCommand &cmd);
+		bool						executeQuit(Client *client, const ParsedCommand &cmd);
+		bool						executeVersion(Client *client, const ParsedCommand &cmd);
+		bool						executeTime(Client *client, const ParsedCommand &cmd);
+		bool						executeMode(Client *client, const ParsedCommand &cmd);
 
 	public:
 		Server(int port, const std::string &password);

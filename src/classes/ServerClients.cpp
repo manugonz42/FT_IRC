@@ -1,23 +1,12 @@
-#include "../../include/Server.hpp"
-#include "../../include/Parser.hpp"
-
-int	Server::sendMessage(int fd ,const std::string &msg)
-{
-	std::string	wire = msg + "\r\n";
-	if (::send(fd, wire.c_str(), wire.size(), 0) == -1)
-	{
-		std::cerr << "Error: send failed" << std::endl;
-		return (0);
-	}
-	return (1);
-}
+#include "Ircserv.hpp"
 
 void	Server::removeClient(size_t i)
 {
 	if (i >= _clientList.size())
 		return;
 	shutdown(_clientList[i]->getFd(), SHUT_WR);
-	delete _clientList[i];
+	if (_clientList[i] != NULL)
+		delete _clientList[i];
 	_clientList.erase(_clientList.begin() + i);
 }
 
@@ -98,7 +87,8 @@ void	Server::processClientsInput()
 					std::cout << " (params: " << cmd.params.size() << ")";
 				}
 				std::cout << std::endl;
-				if (!processCommand(_clientList[client], cmd)) {
+				if (!processCommand(_clientList[client], cmd))
+				{
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 					_pollFds.erase(_pollFds.begin() + i);
 					removeClient(client);
@@ -128,8 +118,6 @@ void	Server::processClientsInput()
 // processCommand para testing del parser
 bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 {
-	std::cout << "Processing command: " << cmd.command << " from client " << client->getFd() << std::endl;
-	
 	// Imprimir parámetros para debugging
 	for (size_t i = 0; i < cmd.params.size(); ++i) {
 		std::cout << "  Param[" << i << "]: '" << cmd.params[i] << "'" << std::endl;
@@ -139,24 +127,32 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	if (cmd.command == "CAP") {
 		if (cmd.params.size() >= 2 && cmd.params[1] == "LS") {
 			// Responder a CAP LS - no ofrecemos capabilities
-			sendMessage(client->getFd(), ":server CAP * LS :");
+			sendMessage(client->getFd(), "CAP * LS :");
 		} else if (cmd.params.size() >= 2 && cmd.params[1] == "END") {
 			// Cliente termina negociación de capabilities
-			sendMessage(client->getFd(), ":server CAP * ACK :");
+			sendMessage(client->getFd(), "CAP * ACK :");
 		}
 	}
 	else if (cmd.command == "PASS") {
 		if (cmd.params.size() >= 2) {
 			std::string password = cmd.params[1];
-			if (password == _password) {
+			if (password == _password)
+			{
 				client->Authenticate();
 				std::cout << "Client " << client->getFd() << " authenticated" << std::endl;
-			} else {
-				sendMessage(client->getFd(), ":server 464 * :Password incorrect");
+			}
+			else
+			{
+				sendMessage(client->getFd(), "464 * :Password incorrect");
 				return false; // Desconectar
 			}
 		}
 	}
+	// else if (!client->isAuthenticated())
+	// {
+	// 	sendMessage(client->getFd(), "451 * :You have not registered");
+	// 	return (true);
+	// }
 	else if (cmd.command == "NICK") {
 		if (cmd.params.size() >= 2) {
 			std::string nick = cmd.params[1];
@@ -172,16 +168,15 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			
 			// Enviar welcome messages
 			std::string nick = client->getField("NICK");
-			sendMessage(client->getFd(), ":server 001 " + nick + " :Welcome to the IRC Network " + nick + "!");
-			sendMessage(client->getFd(), ":server 002 " + nick + " :Your host is server, running version 1.0");
-			sendMessage(client->getFd(), ":server 003 " + nick + " :This server was created today");
-			sendMessage(client->getFd(), ":server 004 " + nick + " server 1.0 o o");
+			sendMessage(client->getFd(), "001 " + nick + " :Welcome to the IRC Network " + nick + "!");
+			sendMessage(client->getFd(), "002 " + nick + " :Your host is server, running version 1.0");
+			sendMessage(client->getFd(), "004 " + nick + " server 1.0");
 			
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
-		} else if (!client->isAuthenticated()) {
-			sendMessage(client->getFd(), ":server 464 * :Password incorrect");
-		}
+		} 
 	}
+	else if (cmd.command == "PING")
+		sendMessage(client->getFd(), "PONG " + cmd.params[1]);
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar
@@ -191,7 +186,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 }
 
 /*
-ejecutarComando(cliente, std::string line)
+ejecutarComando(Client *client, const ParsedCommand &cmd)
 {
 	palabra;
 	for (int i = 0; i < size; i++)

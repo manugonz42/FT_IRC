@@ -14,15 +14,19 @@
 # include <stdio.h>
 # include <cstdlib>
 # include <fcntl.h>
+# include <map>
 # include "Structures.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "Parser.hpp"
 # include "Server.hpp"
+# include "commands.hpp"
+
+#define PREFIX ":server "
 
 #define VALID_IRC_COMMANDS \
-    "CAP", "PASS", "NICK", "USER", "JOIN", "PART", \
-    "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME"
+    "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
+    "PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "TIME", "MODE"
 
 #define VALID_IRC_COMMANDS_COUNT 17
 
@@ -51,5 +55,7 @@ typedef enum e_command
     VERSION,
     TIME,
 }	t_command;
+
+int	sendMessage(int fd ,const std::string &msg);
 
 #endif

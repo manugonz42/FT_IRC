@@ -8,6 +8,7 @@ class Client
 		int			_fd;
 		std::string	_nick;
 		std::string	_username;
+		std::string	_realname;
 		std::string	_inputBuffer;
 		std::string	_hostname;
 		std::string	_realname;

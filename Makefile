@@ -4,6 +4,7 @@ SRC = src/main.cpp\
 	src/classes/Server.cpp\
 	src/classes/ServerClients.cpp\
 	src/classes/Parser.cpp\
+	src/utils/sendMessage.cpp\
 # 	src/classes/Channel.cpp\
 
 OBJ = $(SRC:.cpp=.o)
