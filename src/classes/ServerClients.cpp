@@ -213,9 +213,9 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar
 	}
-	std::map<std::string, Channel *>::iterator	it = _channelMap.find("#ubuntu");
-	if (it != _channelMap.end())
-		it->second->sendMessage("!jimmy@host PRIVMSG #ubuntu :Hola mundo");
+//	std::map<std::string, Channel *>::iterator	it = _channelMap.find("#ubuntu");
+//	if (it != _channelMap.end())
+//		it->second->sendMessage("!jimmy@host PRIVMSG #ubuntu :Hola mundo");
 	return true; // Mantener conexión
 }
 
