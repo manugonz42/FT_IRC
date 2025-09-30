@@ -139,10 +139,10 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	if (cmd.command == "CAP") {
 		if (cmd.params.size() >= 2 && cmd.params[1] == "LS") {
 			// Responder a CAP LS - no ofrecemos capabilities
-			sendMessage(client->getFd(), "CAP * LS :");
+			sendMessage(client->getFd(), "CAP * LS :", PREFIX);
 		} else if (cmd.params.size() >= 2 && cmd.params[1] == "END") {
 			// Cliente termina negociación de capabilities
-			sendMessage(client->getFd(), "CAP * ACK :");
+			sendMessage(client->getFd(), "CAP * ACK :", PREFIX);
 		}
 	}
 	else if (cmd.command == "PASS") {
@@ -155,7 +155,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			}
 			else
 			{
-				sendMessage(client->getFd(), "464 * :Password incorrect");
+				sendMessage(client->getFd(), "464 * :Password incorrect", PREFIX);
 				return false; // Desconectar
 			}
 		}
@@ -200,15 +200,15 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			
 			// Enviar welcome messages
 			std::string nick = client->getField("NICK");
-			sendMessage(client->getFd(), "001 " + nick + " :Welcome to the IRC Network " + nick + "!");
-			sendMessage(client->getFd(), "002 " + nick + " :Your host is server, running version 1.0");
-			sendMessage(client->getFd(), "004 " + nick + " server 1.0");
+			sendMessage(client->getFd(), "001 " + nick + " :Welcome to the IRC Network " + nick + "!", PREFIX);
+			sendMessage(client->getFd(), "002 " + nick + " :Your host is server, running version 1.0", PREFIX);
+			sendMessage(client->getFd(), "004 " + nick + " server 1.0", PREFIX);
 			
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
 		} 
 	}
 	else if (cmd.command == "PING")
-		sendMessage(client->getFd(), "PONG " + cmd.params[1]);
+		sendMessage(client->getFd(), "PONG " + cmd.params[1], PREFIX);
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar

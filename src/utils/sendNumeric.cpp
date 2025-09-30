@@ -48,7 +48,7 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 	if (it != errors.end())
 	{
 		const Numeric &info = it->second;
-		if (!sendMessage(client->getFd(), info.numeric + client->getField("NICK") + info.description))
+		if (!sendMessage(client->getFd(), info.numeric + client->getField("NICK") + info.description, PREFIX))
 			return (0);
 		return (1);
 	}

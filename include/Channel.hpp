@@ -35,7 +35,7 @@ class Channel
 		bool		inviteOnly();
 		bool		topicRestriction();
 
-		void		sendMessage(const std::string& msg) const;
+		void		sendMessage(const std::string& msg, const std::string& prefix) const;
 };
 
 #endif

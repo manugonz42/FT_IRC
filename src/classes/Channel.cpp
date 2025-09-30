@@ -101,7 +101,7 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     
     // 1. Confirmar JOIN al cliente
     std::string joinMsg = nick + "!user@host JOIN " + channelName;
-    ::sendMessage(client.getFd(), joinMsg);
+    ::sendMessage(client.getFd(), joinMsg, PREFIX);
     
     
     // 2. Enviar lista de usuarios (RPL_NAMREPLY)
@@ -118,11 +118,11 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     }
     
     std::string namesMsg = "353 " + nick + " = " + channelName + " :" + userList;
-    ::sendMessage(client.getFd(), namesMsg);
+    ::sendMessage(client.getFd(), namesMsg, PREFIX);
     
     // 3. Fin de la lista (RPL_ENDOFNAMES)
     std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
-    ::sendMessage(client.getFd(), endMsg);
+    ::sendMessage(client.getFd(), endMsg, PREFIX);
 
 
 	std::map<std::string, Client *>::iterator	it2 = _clientChannelList.begin();
@@ -139,7 +139,7 @@ bool	Channel::removeClient(const std::string& nick, const std::string& msg)
 	if (it == _clientChannelList.end())
 		return false;
 	if (msg != "")
-		::sendMessage(it->second->getFd(), msg);
+		::sendMessage(it->second->getFd(), msg, PREFIX);
 	_clientChannelList.erase(it);
 	return true;
 }
@@ -171,14 +171,14 @@ bool	Channel::topicRestriction()
 	return true;
 }
 
-void	Channel::sendMessage(const std::string& msg) const
+void	Channel::sendMessage(const std::string& msg, const std::string& prefix) const
 {
 	std::map<std::string, Client *>::const_iterator	it = _clientChannelList.begin();
 	std::map<std::string, Client *>::const_iterator	end = _clientChannelList.end();
 	for (; it != end; ++it)
 	{
 //		std::cout << "Cliente: " << it->first << std::endl;
-		//::sendMessage(it->second->getFd(), msg);
+//		::sendMessage(it->second->getFd(), msg);
 		std::string	wire = ":jimmy " + msg + "\r\n";
 		if (::send(it->second->getFd(), wire.c_str(), wire.size(), 0) == -1)
 		{

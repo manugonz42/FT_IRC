@@ -23,7 +23,7 @@
 # include "Server.hpp"
 # include "commands.hpp"
 
-#define PREFIX ":server "
+#define PREFIX "server"
 
 #define VALID_IRC_COMMANDS \
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
@@ -58,6 +58,6 @@ typedef enum e_command
     TIME,
 }	t_command;
 
-int	sendMessage(int fd ,const std::string &msg);
+int	sendMessage(int fd ,const std::string &msg, const std::string& prefix);
 int	sendNumeric(Client *client, int numeric, const std::string &target);
 #endif
