@@ -4,6 +4,7 @@
 # include <vector>
 # include <iostream>
 # include <csignal>
+# include <cctype>
 # include <sys/signal.h>
 # include <sys/socket.h>
 # include <sys/poll.h>
@@ -38,6 +39,7 @@ enum LoginStatus
     USER_SENT,      // Usuario enviado (NUEVO)
     REGISTERED      // Login completo
 };
+#define VALID_IRC_COMMANDS_COUNT 16
 
 typedef enum e_command
 {
