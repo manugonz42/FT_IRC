@@ -48,5 +48,5 @@ typedef enum e_command
 }	t_command;
 
 int	sendMessage(int fd ,const std::string &msg);
-
+int	sendNumeric(Client *client, int numeric, const std::string &target);
 #endif

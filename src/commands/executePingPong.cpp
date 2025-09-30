@@ -1,3 +1,4 @@
+
 #include "Ircserv.hpp"
 
 bool	Server::executePingPong(Client *client, const ParsedCommand &cmd)
