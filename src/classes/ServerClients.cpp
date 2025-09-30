@@ -57,8 +57,15 @@ void	Server::processClientsInput()
 	{
 		size_t	client = i - 1;
 		short	revents = _pollFds[i].revents;
+		//bool	clientDisconnected = false;
 		if (revents & (POLLERR | POLLHUP | POLLNVAL))
-		revents |= POLLIN;
+        {
+           // std::cout << "Client disconnected (error): " << _pollFds[i].fd << std::endl;
+            //_pollFds.erase(_pollFds.begin() + i);
+            //removeClient(client);
+            //continue; // NO incrementar i
+			revents |= POLLIN;
+        }
 		if (revents & POLLIN)
 		{
 			int	bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
@@ -71,7 +78,7 @@ void	Server::processClientsInput()
 			}
 			buffer[bytes] = '\0';
 			_clientList[client]->appendToBuffer(buffer, bytes);
-			while (_clientList[client]->extractedLine(line))
+			while (_clientList[client]->extractedLine(line)/* && !clientDisconnected*/)
 			{
 				// IMPLEMENTACIÓN CON PARSER
 				ParsedCommand cmd = Parser::parse(line);
@@ -92,7 +99,7 @@ void	Server::processClientsInput()
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 					_pollFds.erase(_pollFds.begin() + i);
 					removeClient(client);
-					break;
+				//	clientDisconnected = true;
 				}
 				// IMPLEMENTACIÓN ANTERIOR 
 				/*
@@ -110,8 +117,13 @@ void	Server::processClientsInput()
 				*/
 			}
 		}
+		//if (!clientDisconnected)
+		//{
+		//	_pollFds[i].revents = 0;
+		//	i++;
+		//}
 		_pollFds[i].revents = 0;
-		i++;
+			i++;
 	}
 }
 
@@ -148,6 +160,22 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			}
 		}
 	}
+	else if (cmd.command == "JOIN")
+	{
+	/*	int error = 0;
+		socklen_t len = sizeof(error);
+		int result = getsockopt(client->getFd(), SOL_SOCKET, SO_ERROR, &error, &len);
+		if (result != 0 || error != 0)
+		{
+			std::cout << "ERROR: Socket is not valid! getsockopt result: " << result << " error result: " << error << std::endl;
+			return false;
+		}
+		else
+			std::cout << "No hay error con el Socket" << std::endl;*/
+		if (client->isAuthenticated())
+			return executeJoin(client, cmd);
+		return true;
+	}
 	// else if (!client->isAuthenticated())
 	// {
 	// 	sendMessage(client->getFd(), "451 * :You have not registered");
@@ -156,8 +184,12 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	else if (cmd.command == "NICK") {
 		if (cmd.params.size() >= 2) {
 			std::string nick = cmd.params[1];
+			std::map<std::string, Client *>::iterator it = _clientMap.find(nick);
+			if (it != _clientMap.end())
+				nick += "2";
 			client->setField("NICK", nick);
 			std::cout << "Client " << client->getFd() << " set nick: " << nick << std::endl;
+			_clientMap.insert(std::make_pair(nick, client));
 		}
 	}
 	else if (cmd.command == "USER") {
@@ -181,7 +213,9 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar
 	}
-	
+	std::map<std::string, Channel *>::iterator	it = _channelMap.find("#ubuntu");
+	if (it != _channelMap.end())
+		it->second->sendMessage("!jimmy@host PRIVMSG #ubuntu :Hola mundo");
 	return true; // Mantener conexión
 }
 

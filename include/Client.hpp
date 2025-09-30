@@ -16,11 +16,11 @@ class Client
 	public:
 		Client(int fd);
 		~Client();
-		int			getFd();
+		int			getFd() const;
 		void		appendToBuffer(const char *, size_t);
 		bool		extractedLine(std::string &line);
-		std::string	getField(const std::string &type);
-		bool		isAuthenticated();
+		std::string	getField(const std::string &type) const;
+		bool		isAuthenticated() const;
 		void		setField(const std::string &field, const std::string &nick);
 		void		Authenticate();
 };

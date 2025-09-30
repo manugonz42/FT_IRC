@@ -15,7 +15,7 @@ Client::~Client()
 		close (_fd);
 }
 
-int Client::getFd()
+int Client::getFd() const
 {
 	return (_fd);
 }
@@ -45,7 +45,7 @@ void	Client::setField(const std::string &type, const std::string &field)
 		_username = field;
 }
 
-std::string		Client::getField(const std::string &type)
+std::string		Client::getField(const std::string &type) const
 {
 	if (type == "NICK")
 		return (_nick);
@@ -53,7 +53,7 @@ std::string		Client::getField(const std::string &type)
 		return (_username);
 }
 
-bool	Client::isAuthenticated()
+bool	Client::isAuthenticated() const
 {
 	return (_authenticated);
 }
