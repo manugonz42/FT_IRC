@@ -1,5 +1,4 @@
 #include "Ircserv.hpp"
-
 bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 {
 	if (cmd.params.size() != 3)
@@ -20,6 +19,7 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 			if (sendNumeric(client, 403, cmd.params[1]))
 				return (false);
 		}
-		Channel &channel;
+		Channel *channel = i->second;
+		channel->sendMessage(cmd.params[2]);
 	}
 }
