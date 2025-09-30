@@ -5,7 +5,8 @@ void	Server::removeClient(size_t i)
 	if (i >= _clientList.size())
 		return;
 	shutdown(_clientList[i]->getFd(), SHUT_WR);
-	delete _clientList[i];
+	if (_clientList[i] != NULL)
+		delete _clientList[i];
 	_clientList.erase(_clientList.begin() + i);
 }
 
@@ -86,7 +87,8 @@ void	Server::processClientsInput()
 					std::cout << " (params: " << cmd.params.size() << ")";
 				}
 				std::cout << std::endl;
-				if (!processCommand(_clientList[client], cmd)) {
+				if (!processCommand(_clientList[client], cmd))
+				{
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 					_pollFds.erase(_pollFds.begin() + i);
 					removeClient(client);
@@ -134,15 +136,23 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	else if (cmd.command == "PASS") {
 		if (cmd.params.size() >= 2) {
 			std::string password = cmd.params[1];
-			if (password == _password) {
+			if (password == _password)
+			{
 				client->Authenticate();
 				std::cout << "Client " << client->getFd() << " authenticated" << std::endl;
-			} else {
+			}
+			else
+			{
 				sendMessage(client->getFd(), "464 * :Password incorrect");
 				return false; // Desconectar
 			}
 		}
 	}
+	// else if (!client->isAuthenticated())
+	// {
+	// 	sendMessage(client->getFd(), "451 * :You have not registered");
+	// 	return (true);
+	// }
 	else if (cmd.command == "NICK") {
 		if (cmd.params.size() >= 2) {
 			std::string nick = cmd.params[1];
@@ -163,9 +173,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			sendMessage(client->getFd(), "004 " + nick + " server 1.0");
 			
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
-		} else if (!client->isAuthenticated()) {
-			sendMessage(client->getFd(), "464 * :Password incorrect");
-		}
+		} 
 	}
 	else if (cmd.command == "PING")
 		sendMessage(client->getFd(), "PONG " + cmd.params[1]);
