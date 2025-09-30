@@ -15,7 +15,10 @@ class Server
 		std::string					_password;
 		std::vector<struct pollfd>	_pollFds;
 		std::vector<Client *>		_clientList;
-		// std::vector<Channel *>		_channelList;
+		std::vector<Channel *>		_channelList;
+
+
+		
 		void						acceptNewClient();
 		void						removeClient(size_t i);
 		void						processClientsInput();
