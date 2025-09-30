@@ -5,7 +5,8 @@ SRC = src/main.cpp\
 	src/classes/ServerClients.cpp\
 	src/classes/Parser.cpp\
 	src/utils/sendMessage.cpp\
-# 	src/classes/Channel.cpp\
+	src/classes/Channel.cpp\
+	src/commands/executeJoin.cpp
 
 OBJ = $(SRC:.cpp=.o)
 CC = c++

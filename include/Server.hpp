@@ -1,9 +1,11 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 #include "Ircserv.hpp"
+#include "Channel.hpp"
 
 // Forward declaration para evitar dependencia circular
 struct ParsedCommand;
+class Channel;
 
 class Server
 {
@@ -24,6 +26,7 @@ class Server
 		void						shutdownClients();
 		bool						processCommand(Client *client, const ParsedCommand &cmd);
 		int							wellcome(Client *client ,const std::string &request);  // Método original mantenido
+		bool						createChannel(const Client& client, const std::string& name);
 
 
 		bool						executePingPong(Client *client, const ParsedCommand &cmd);
