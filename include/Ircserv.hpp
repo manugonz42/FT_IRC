@@ -24,7 +24,16 @@
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", \
     "PRIVMSG", "NOTICE", "QUIT", "PING", "PONG", "VERSION", "TIME"
 
-#define VALID_IRC_COMMANDS_COUNT 13
+#define VALID_IRC_COMMANDS_COUNT 17
+
+enum LoginStatus
+{
+    UNREGISTERED,   // Recién conectado
+    PASS_SENT,      // Contraseña enviada
+    NICK_SENT,      // Nickname enviado  
+    USER_SENT,      // Usuario enviado (NUEVO)
+    REGISTERED      // Login completo
+};
 
 typedef enum e_command
 {
