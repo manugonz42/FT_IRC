@@ -28,7 +28,7 @@
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
     "PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "TIME", "MODE"
 
-#define VALID_IRC_COMMANDS_COUNT 17
+#define VALID_IRC_COMMANDS_COUNT 16
 
 enum LoginStatus
 {
