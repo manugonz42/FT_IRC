@@ -5,6 +5,7 @@ SRC = src/main.cpp\
 	src/classes/ServerClients.cpp\
 	src/classes/Parser.cpp\
 	src/utils/sendMessage.cpp\
+	src/utils/sendNumeric.cpp\
 	src/classes/Channel.cpp\
 	src/commands/executeJoin.cpp
 

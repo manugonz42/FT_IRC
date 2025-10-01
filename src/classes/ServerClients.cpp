@@ -99,6 +99,7 @@ void	Server::processClientsInput()
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 					_pollFds.erase(_pollFds.begin() + i);
 					removeClient(client);
+					break; // Tiene que haber break aqui, si no, intenta leer de un cliente inexistente
 				//	clientDisconnected = true;
 				}
 				// IMPLEMENTACIÓN ANTERIOR 

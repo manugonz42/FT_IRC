@@ -30,6 +30,7 @@ static	void fillErrors(std::map<int, Numeric> &errors)
 	errors[443] = makeNumeric("443 ", " :is already on channel");
 	errors[461] = makeNumeric("461 ", " :Not enough parameters");
 	errors[462] = makeNumeric("462 ", " :You may not reregister");
+	errors[464] = makeNumeric("464 ", " :Password incorrect");
 	errors[471] = makeNumeric("471 ", " :Cannot join channel (+l)");
 	errors[473] = makeNumeric("473 ", " :Cannot join channel (+i)");
 	errors[474] = makeNumeric("474 ", " :Cannot join channel (+b)");
@@ -42,6 +43,7 @@ static	void fillErrors(std::map<int, Numeric> &errors)
 
 int	sendNumeric(Client *client, int numeric, const std::string &target)
 {
+	(void)target;
 	std::map<int, Numeric> errors;
 	fillErrors(errors);
 	std::map<int, Numeric>::iterator it = errors.find(numeric);
@@ -52,5 +54,7 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			return (0);
 		return (1);
 	}
+	std::cerr << "Error: No such numeric" << std::endl;
+	return (0);
 	//error de find
 }
