@@ -1,6 +1,6 @@
 #include "Ircserv.hpp"
 
-int	sendMessage(int fd ,const std::string &msg)
+int	sendMessage(std::string prefix, int fd ,const std::string &msg)
 {
 	/*int error = 0;
 	socklen_t len = sizeof(error);
@@ -12,7 +12,7 @@ int	sendMessage(int fd ,const std::string &msg)
 	}
 	else
 		std::cout << "No hay error con el Socket" << std::endl;*/
-	std::string	wire = PREFIX + msg + "\r\n";
+	std::string	wire = prefix + msg + "\r\n";
 	if (::send(fd, wire.c_str(), wire.size(), 0) == -1)
 	{
 		std::cerr << "Error: send failed" << std::endl;

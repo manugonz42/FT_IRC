@@ -58,6 +58,6 @@ typedef enum e_command
     TIME,
 }	t_command;
 
-int	sendMessage(int fd ,const std::string &msg);
+int	sendMessage(std::string prefix, int fd ,const std::string &msg);
 int	sendNumeric(Client *client, int numeric, const std::string &target);
 #endif

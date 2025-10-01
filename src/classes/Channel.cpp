@@ -101,7 +101,7 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     
     // 1. Confirmar JOIN al cliente
     std::string joinMsg = nick + "!user@host JOIN " + channelName;
-    ::sendMessage(client.getFd(), joinMsg);
+    ::sendMessage(":server " ,client.getFd(), joinMsg);
     
     
     // 2. Enviar lista de usuarios (RPL_NAMREPLY)
@@ -118,11 +118,11 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     }
     
     std::string namesMsg = "353 " + nick + " = " + channelName + " :" + userList;
-    ::sendMessage(client.getFd(), namesMsg);
+    ::sendMessage(":server " , client.getFd(), namesMsg);
     
     // 3. Fin de la lista (RPL_ENDOFNAMES)
     std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
-    ::sendMessage(client.getFd(), endMsg);
+    ::sendMessage(":server ", client.getFd(), endMsg);
 
 
 	std::map<std::string, Client *>::iterator	it2 = _clientChannelList.begin();
@@ -139,7 +139,7 @@ bool	Channel::removeClient(const std::string& nick, const std::string& msg)
 	if (it == _clientChannelList.end())
 		return false;
 	if (msg != "")
-		::sendMessage(it->second->getFd(), msg);
+		::sendMessage(":server ", it->second->getFd(), msg);
 	_clientChannelList.erase(it);
 	return true;
 }
