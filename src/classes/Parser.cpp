@@ -15,34 +15,42 @@ ParsedCommand Parser::parse(const std::string& rawMessage)
 	std::string trimmed = trim(rawMessage);
 
 	// Validación básica de formato
-	if (!hasValidFormat(trimmed)) {
+	if (!hasValidFormat(trimmed))
+	{
 		result.isValid = false;
 		return result;
 	}
 	
 	// Eliminar prefix si existe 
 	std::string cleaned = removePrefix(trimmed, result);
-	if (cleaned.empty()) {
+	if (cleaned.empty())
+	{
 		result.isValid = false;
 		return result;
 	}
 	
 	// Extraer comando 
 	std::string command = extractCommand(cleaned);
-	if (command.empty()) {
+	if (command.empty())
+	{
 		result.isValid = false;
 		return result;
 	}
 	
 	// Validar que el comando sea válido
-	if (!isValidCommand(command)) {
+	if (!isValidCommand(command))
+	{
 		result.isValid = false;
 		return result;
 	}
 	
 	// Tokenizar el mensaje completo (pasamos cleaned)
 	std::vector<std::string> tokens = tokenize(cleaned);
-	
+	if (tokens.size() > 15) 
+	{
+		result.isValid = false;
+		return result;
+	}
 	// Llenar la estructura resultado
 	result.command = command;
 	result.params = tokens;
@@ -58,7 +66,8 @@ bool Parser::isValidCommand(const std::string& command)
 	// Comparar contra la lista de comandos válidos
 	static const char* VALID_COMMANDS[] = { VALID_IRC_COMMANDS };
 	
-	for (size_t i = 0; i < VALID_IRC_COMMANDS_COUNT; ++i) {
+	for (size_t i = 0; i < VALID_IRC_COMMANDS_COUNT; ++i)
+	{
 		if (command == VALID_COMMANDS[i])
 			return true;
 	}
@@ -81,14 +90,13 @@ bool Parser::isValidMessage(const std::string& message) //
 std::string Parser::extractCommand(const std::string& message)
 {
 	// Encontrar el final de la primera palabra (el comando)
-	size_t end = message.find_first_of(" \t\r\n");
+	size_t end = message.find_first_of(" ");
 	if (end == std::string::npos)
 		end = message.length(); // Comando hasta el final
 
 	// Extraer y convertir a mayúsculas
 	std::string command = message.substr(0, end);
-	for (size_t i = 0; i < command.length(); ++i)
-		command[i] = std::toupper(command[i]);
+	command = strToUpper(command);
 
 	return command;
 }
@@ -103,23 +111,25 @@ std::vector<std::string> Parser::tokenize(const std::string& message)
 	std::vector<std::string> tokens;
 	size_t pos = 0;
 	
-	while (pos < message.length()) {
+	while (pos < message.length())
+	{
 		// Saltar whitespace al principio
-		pos = message.find_first_not_of(" \t\r\n", pos);
+		pos = message.find_first_not_of(" ", pos);
 		
 		// Si llegamos al final, salir
 		if (pos == std::string::npos)
 			break;
 		
 		// Si encontramos ':', es el trailing parameter (resto del mensaje)
-		if (message[pos] == ':') {
+		if (message[pos] == ':')
+		{
 			tokens.push_back(message.substr(pos));
 			break;
 		}
 		
 		// Buscar el final de este token (siguiente whitespace)
 		size_t start = pos;
-		pos = message.find_first_of(" \t\r\n", start);
+		pos = message.find_first_of(" ", start);
 
 		// Agregar el token encontrado
 		tokens.push_back(message.substr(start, pos - start));
@@ -133,9 +143,8 @@ std::string Parser::trim(const std::string& str)
 {
 	// TODO: Implementar función trim
 	// - Eliminar espacios, tabs, \r, \n del principio y final
-	const std::string whitespace = " \t\r\n";
-	size_t start = str.find_first_not_of(whitespace);
-	size_t end = str.find_last_not_of(whitespace);
+	size_t start = str.find_first_not_of(" ");
+	size_t end = str.find_last_not_of(" ");
 	
 	if (start == std::string::npos || end == std::string::npos)
 		return "";
@@ -151,7 +160,7 @@ std::string Parser::removePrefix(const std::string& message, ParsedCommand& resu
 		return message;
 	
 	// Buscar el primer whitespace después del prefix
-	size_t spacePos = message.find_first_of(" \t\r\n");
+	size_t spacePos = message.find_first_of(" ");
 	if (spacePos == std::string::npos)
 		return ""; // Solo hay prefix, no hay comando
 	
@@ -159,7 +168,7 @@ std::string Parser::removePrefix(const std::string& message, ParsedCommand& resu
 	result.prefix = message.substr(1, spacePos - 1);
 	
 	// Saltar todos los whitespace después del prefix
-	size_t start = message.find_first_not_of(" \t\r\n", spacePos);
+	size_t start = message.find_first_not_of(" ", spacePos);
 	
 	// Devolver mensaje sin prefix
 	return message.substr(start);

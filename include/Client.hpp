@@ -11,8 +11,7 @@ class Client
 		std::string	_realname;
 		std::string	_inputBuffer;
 		std::string	_hostname;
-//		std::string	_realname;
-//		LoginStatus	_loginStatus;
+		LoginStatus	_loginStatus;
 		bool		_authenticated;
 
 
@@ -26,6 +25,10 @@ class Client
 		bool		isAuthenticated() const;
 		void		setField(const std::string &field, const std::string &nick);
 		void		Authenticate();
+
+		// Getters y setters
+		void		setLoginStatus(LoginStatus status);
+		LoginStatus	getLoginStatus() const;
 		
 };
 

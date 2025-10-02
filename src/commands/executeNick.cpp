@@ -1,9 +1,11 @@
 #include "Ircserv.hpp"
+
+
 // Función para verificar si un nick ya está en uso
 bool isSpecial(char c) 
 { 
     return c == '[' || c == ']' || c == '\\' || c == '`' || 
-           c == '_' || c == '^' || c == '{' || c == '|' || c == '}'; 
+           c == '-' || c == '^' || c == '{' || c == '}'; 
 }
 
 // Función para validar el formato del nick
@@ -14,14 +16,14 @@ bool isValidNickname(const std::string &nick)
     
     // Primer carácter: letra o especial
     char first = nick[0];
-    if (!std::isalpha(first) && !isSpecial(first))
+    if (!std::isalpha(first))
         return false;
     
-    // Resto: letra, dígito, especial o guión
+    // Resto: letra, dígito, especial
     for (size_t i = 1; i < nick.length(); i++)
     {
         char c = nick[i];
-        if (!std::isalnum(c) && !isSpecial(c) && c != '-')
+        if (!std::isalnum(c) && !isSpecial(c))
             return false;
     }
     
@@ -43,9 +45,10 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         // error 432
         return false;
     }
-    
     // 3. Verificar si ya está en uso
-    if (isNicknameInUse(cmd.params[1]))
+    std::string upperNick = strToUpper(cmd.params[1]);
+
+    if (_clientMap.find(upperNick) != _clientMap.end())
     {
         if (client->getLoginStatus() < REGISTERED)
         {

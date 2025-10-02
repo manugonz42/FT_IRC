@@ -61,3 +61,12 @@ void		Client::Authenticate()
 {
 	_authenticated = true;
 }
+
+void	Client::setLoginStatus(LoginStatus status)
+{
+	_loginStatus = status;
+}
+LoginStatus	Client::getLoginStatus() const
+{
+	return (_loginStatus);
+}
