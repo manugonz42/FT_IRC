@@ -30,7 +30,7 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 	int	validCmd = commandIsValid(client, cmd);
 	if (validCmd)
 	{
-		std::string prefix = ":" + client->getField("NICK") + "!" + client->getField("USER") + ":" + client->getField("HOST");
+		std::string prefix = ":" + client->getField("NICK") + "!" + client->getField("USER") + ":" + /* client->getField("HOST") */"localhost" + " ";
 		if (cmd.params[1][0] == '#')
 		{
 			std::map<std::string, Channel *>::iterator i = _channelMap.find(cmd.params[1]);
@@ -41,7 +41,7 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 				return (true);
 			}
 			Channel *channel = i->second;
-			channel->sendMessage(prefix ,cmd.params[2]);
+			channel->sendMessage("PRIVMSG " + cmd.params[1] + " " + cmd.params[2], prefix);
 		}
 		else
 		{
@@ -53,7 +53,7 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 					return(false);
 				return (true);
 			}
-			::sendMessage(prefix, i->second->getFd(), cmd.params[2]);
+			::sendMessage(prefix, i->second->getFd(), "PRIVMSG " + cmd.params[1] + " "  + cmd.params[2]);
 		}
 	}
 	else if (validCmd == -1)

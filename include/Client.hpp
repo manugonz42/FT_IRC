@@ -11,7 +11,6 @@ class Client
 		std::string	_realname;
 		std::string	_inputBuffer;
 		std::string	_hostname;
-//		std::string	_realname;
 //		LoginStatus	_loginStatus;
 		bool		_authenticated;
 

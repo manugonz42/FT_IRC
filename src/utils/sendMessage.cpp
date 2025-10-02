@@ -13,6 +13,7 @@ int	sendMessage(std::string prefix, int fd ,const std::string &msg)
 	else
 		std::cout << "No hay error con el Socket" << std::endl;*/
 	std::string	wire = prefix + msg + "\r\n";
+	std::cout << "Sending : " << "\"" + wire + "\"" << std::endl;
 	if (::send(fd, wire.c_str(), wire.size(), 0) == -1)
 	{
 		std::cerr << "Error: send failed" << std::endl;

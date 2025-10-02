@@ -178,13 +178,11 @@ void	Channel::sendMessage(const std::string& msg, const std::string& prefix) con
 	for (; it != end; ++it)
 	{
 		std::cout << "Cliente: " << it->first << std::endl;
-		::sendMessage(prefix, it->second->getFd(), msg);
-		// std::string	wire = ":jimmy " + msg + "\r\n";
-		// if (::send(it->second->getFd(), wire.c_str(), wire.size(), 0) == -1)
-		// {
-		// 	std::cerr << "Error: send failed" << std::endl;
-		// 	return;
-		// }
+		if ((::sendMessage(prefix, it->second->getFd(), msg)) < 0)
+		{
+			std::cerr << "Error: send failed" << std::endl;
+			return;
+		}
 	}
 }
 
