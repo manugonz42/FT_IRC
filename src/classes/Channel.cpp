@@ -171,7 +171,7 @@ bool	Channel::topicRestriction()
 	return true;
 }
 
-void	Channel::sendMessage(const std::string& msg) const
+void	Channel::sendMessage(std::string &prefix, const std::string& msg) const
 {
 	std::map<std::string, Client *>::const_iterator	it = _clientChannelList.begin();
 	std::map<std::string, Client *>::const_iterator	end = _clientChannelList.end();
@@ -179,7 +179,7 @@ void	Channel::sendMessage(const std::string& msg) const
 	{
 //		std::cout << "Cliente: " << it->first << std::endl;
 		//::sendMessage(it->second->getFd(), msg);
-		std::string	wire = ":jimmy " + msg + "\r\n";
+		std::string	wire = prefix + msg + "\r\n";
 		if (::send(it->second->getFd(), wire.c_str(), wire.size(), 0) == -1)
 		{
 			std::cerr << "Error: send failed" << std::endl;
