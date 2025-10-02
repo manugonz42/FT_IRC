@@ -10,24 +10,69 @@
 */
 
 
-static bool	isValid(const ParsedCommand& cmd)
+static bool	isValid(const std::string& channel)
 {
-	if (cmd.params.size() < 2)
-        return false;
-    if (cmd.params[1].empty() || cmd.params[1][0] != '#')
+    if (channel.empty() || channel[0] != '#')
         return false;
     return true;
 }
 
+std::vector<std::string> parseChannels(const std::string& channelParam) {
+    std::vector<std::string> channels;
+    
+    if (channelParam.empty()) {
+        return channels;
+    }
+    
+    std::string current = "";
+    
+    for (size_t i = 0; i < channelParam.length(); ++i) {
+        char c = channelParam[i];
+        
+        if (c == ',') {
+            if (!current.empty()) {
+                channels.push_back(current);
+                current = "";
+            }
+        } else 
+            current += c;
+        
+    }
+    
+    if (!current.empty()) {
+        channels.push_back(current);
+    }
+    
+    return channels;
+}
 
 bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 {
 //	cmd[1] = nombre del canal;
-	if (!isValid(cmd))
+	if (cmd.params.size() < 2)
+        return true;
+
+	std::vector<std::string> channels = parseChannels(cmd.params[1]);
+	
+	// Validar cada canal del vector
+	for (size_t i = 0; i < channels.size(); ++i)
+	{
+		if (!isValid(channels[i]))
+		{
+			return true;
+		}
+	}
+	
+	if (channels.empty()) {
 		return true;
-	std::map<std::string, Channel *>::iterator	it = _channelMap.find(cmd.params[1]);
+	}
+	
+	// Procesar solo el primer canal (filtro temporal)
+	std::string channelName = channels[0];
+	
+	std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 	if (it == _channelMap.end())
-		return createChannel(*client, cmd.params[1]);
+		return createChannel(*client, channelName);
 	if (!it->second->isInviteOnly() && !it->second->isFull())
 			return it->second->addClient(*client, false);
 	return true;
