@@ -9,7 +9,7 @@
 	debería poder unirse a un canal.
 */
 
-
+// DESDE AQUI ------------------------------------
 static bool	isValid(const std::string& channel)
 {
     if (channel.empty() || channel[0] != '#')
@@ -60,6 +60,7 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 			return true;
 		}
 		}
+// HASTA AQUI ------------------------------------		
 	std::map<std::string, Channel *>::iterator	it = _channelMap.find(cmd.params[1]);
 	if (it == _channelMap.end())
 		return createChannel(*client, cmd.params[1]);
