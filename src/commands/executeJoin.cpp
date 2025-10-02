@@ -9,58 +9,22 @@
 	debería poder unirse a un canal.
 */
 
-// DESDE AQUI ------------------------------------
-static bool	isValid(const std::string& channel)
+
+static bool	isValid(const ParsedCommand& cmd)
 {
-    if (channel.empty() || channel[0] != '#')
+	if (cmd.params.size() < 2)
+        return false;
+    if (cmd.params[1].empty() || cmd.params[1][0] != '#')
         return false;
     return true;
 }
 
-std::vector<std::string> parseChannels(const std::string& channelParam) {
-    std::vector<std::string> channels;
-    
-    if (channelParam.empty()) {
-        return channels;
-    }
-    
-    std::string current = "";
-    
-    for (size_t i = 0; i < channelParam.length(); ++i) {
-        char c = channelParam[i];
-        
-        if (c == ',') {
-            if (!current.empty()) {
-                channels.push_back(current);
-                current = "";
-            }
-        } else if (c != ' ' && c != '\t') {
-            current += c;
-        }
-    }
-    
-    if (!current.empty()) {
-        channels.push_back(current);
-    }
-    
-    return channels;
-}
 
 bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 {
 //	cmd[1] = nombre del canal;
-	if (cmd.params.size() < 2)
-        return false;
-
-	std::vector<std::string> channels = parseChannels(cmd.params[1]);
-	for (size_t i = 0; i < channels.size(); ++i)
-	{
-		if (!isValid(channels[i]))
-		{
-			return true;
-		}
-		}
-// HASTA AQUI ------------------------------------		
+	if (!isValid(cmd))
+		return true;
 	std::map<std::string, Channel *>::iterator	it = _channelMap.find(cmd.params[1]);
 	if (it == _channelMap.end())
 		return createChannel(*client, cmd.params[1]);
