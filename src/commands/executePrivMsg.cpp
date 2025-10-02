@@ -53,7 +53,7 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 					return(false);
 				return (true);
 			}
-			sendMessage(prefix, i->second->getFd(), cmd.params[2]);
+			::sendMessage(prefix, i->second->getFd(), cmd.params[2]);
 		}
 	}
 	else if (validCmd == -1)
