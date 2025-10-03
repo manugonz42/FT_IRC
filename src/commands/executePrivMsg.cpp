@@ -11,14 +11,14 @@ int	commandIsValid(Client *client, const ParsedCommand &cmd)
 		}
 		else
 		{
-			if (sendNumeric(client, 412, ""))
+			if (!sendNumeric(client, 412, ""))
 				return (-1);
 		}	
 		return (0);
 	}
 	if (cmd.params[2][0] != ':' || cmd.params[2].size() == 1)
 	{
-		if (sendNumeric(client, 412, ""))
+		if (!sendNumeric(client, 412, ""))
 			return (-1);
 		return (0);
 	}
@@ -27,36 +27,36 @@ int	commandIsValid(Client *client, const ParsedCommand &cmd)
 
 bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 {
-	int	validCmd = commandIsValid(client, cmd);
-	if (validCmd)
-	{
-		std::string prefix = ":" + client->getField("NICK") + "!" + client->getField("USER") + ":" + /* client->getField("HOST") */"localhost" + " ";
-		if (cmd.params[1][0] == '#')
-		{
-			std::map<std::string, Channel *>::iterator i = _channelMap.find(cmd.params[1]);
-			if (i == _channelMap.end())
-			{
-				if (sendNumeric(client, 401/*403*/, cmd.params[1]))
-					return (false);
-				return (true);
-			}
-			Channel *channel = i->second;
-			channel->sendMessage(client->getField("NICK"), "PRIVMSG " + cmd.params[1] + " " + cmd.params[2], prefix);
-		}
-		else
-		{
-			std::map<std::string, Client *>::iterator i;
-			i = _clientMap.find(cmd.params[1]);
-			if (i == _clientMap.end())
-			{
-				if (sendNumeric(client, 401, cmd.params[1]))
-					return(false);
-				return (true);
-			}
-			::sendMessage(prefix, i->second->getFd(), "PRIVMSG " + cmd.params[1] + " "  + cmd.params[2]);
-		}
-	}
-	else if (validCmd == -1)
+	int			validCmd = commandIsValid(client, cmd);
+	if (validCmd == -1)
 		return (false);
+	if (!validCmd)
+		return (true);
+	std::string	text = cmd.params[1] + " " + cmd.params[2];
+	std::string prefix = ":" + client->getField("NICK") + "!" + client->getField("USER") + ":" + /* client->getField("HOST") */"localhost" + " ";
+	if (cmd.params[1][0] == '#')
+	{
+		std::map<std::string, Channel *>::iterator i = _channelMap.find(cmd.params[1]);
+		if (i == _channelMap.end())
+		{
+			if (!sendNumeric(client, 401, cmd.params[1]))
+				return (false);
+			return (true);
+		}
+		Channel *channel = i->second;
+		channel->sendMessage(client, "PRIVMSG " + text, prefix);
+	}
+	else
+	{
+		std::map<std::string, Client *>::iterator i;
+		i = _clientMap.find(cmd.params[1]);
+		if (i == _clientMap.end())
+		{
+			if (!sendNumeric(client, 401, cmd.params[1]))
+				return(false);
+			return (true);
+		}
+		::sendMessage(prefix, i->second->getFd(), "PRIVMSG " + text);
+	}
 	return (true);
 }

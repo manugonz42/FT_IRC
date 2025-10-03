@@ -27,7 +27,7 @@
 
 #define VALID_IRC_COMMANDS \
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
-    "PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "TIME", "MODE"
+    "PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "TIME", "MODE", /* "WHO", "WHOIS" */
 
 #define VALID_IRC_COMMANDS_COUNT 16
 
