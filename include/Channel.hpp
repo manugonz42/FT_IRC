@@ -27,6 +27,8 @@ class Channel
 		bool		isClient(const Client& client) const;
 		bool		isClient(const std::string& nick) const;
 		bool		isFull() const;
+		bool		hasPass() const;
+		std::string	getClients() const;
 
 		bool		addClient(const Client& client, bool isOperator);
 		bool		removeClient(const std::string& username, const std::string& msg);
