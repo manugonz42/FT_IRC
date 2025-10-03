@@ -34,7 +34,7 @@ class Channel
 		bool		makeOperator(const std::string& nick);
 		bool		inviteOnly();
 		bool		topicRestriction();
-		void		sendMessage(const std::string& msg, const std::string& prefix) const;
+		void		sendMessage(const std::string &sender, const std::string& msg, const std::string& prefix) const;
 };
 
 #endif

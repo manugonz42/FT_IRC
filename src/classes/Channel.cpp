@@ -171,12 +171,14 @@ bool	Channel::topicRestriction()
 	return true;
 }
 
-void	Channel::sendMessage(const std::string& msg, const std::string& prefix) const
+void	Channel::sendMessage(const std::string &sender, const std::string& msg, const std::string& prefix) const
 {
 	std::map<std::string, Client *>::const_iterator	it = _clientChannelList.begin();
 	std::map<std::string, Client *>::const_iterator	end = _clientChannelList.end();
 	for (; it != end; ++it)
 	{
+		if (sender == it->second->getField("NICK"))
+			continue;
 		std::cout << "Cliente: " << it->first << std::endl;
 		if ((::sendMessage(prefix, it->second->getFd(), msg)) < 0)
 		{

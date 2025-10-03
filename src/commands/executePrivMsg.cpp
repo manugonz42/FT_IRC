@@ -41,7 +41,7 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 				return (true);
 			}
 			Channel *channel = i->second;
-			channel->sendMessage("PRIVMSG " + cmd.params[1] + " " + cmd.params[2], prefix);
+			channel->sendMessage(client->getField("NICK"), "PRIVMSG " + cmd.params[1] + " " + cmd.params[2], prefix);
 		}
 		else
 		{
