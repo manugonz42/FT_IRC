@@ -7,7 +7,8 @@ SRC = src/main.cpp\
 	src/utils/sendMessage.cpp\
 	src/utils/sendNumeric.cpp\
 	src/classes/Channel.cpp\
-	src/commands/executeJoin.cpp
+	src/commands/executeJoin.cpp\
+	src/commands/executePrivMsg.cpp\
 
 OBJ = $(SRC:.cpp=.o)
 CC = c++

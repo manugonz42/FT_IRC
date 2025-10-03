@@ -133,11 +133,9 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
     ::sendMessage(":server ", client.getFd(), endMsg);
 
-
 	std::map<std::string, Client *>::iterator	it2 = _clientChannelList.begin();
 	for (;it2 != _clientChannelList.end(); ++it2)
 		std::cout << "Cliente: " << it2->first << std::endl;
-
 
     return true;
 }
@@ -180,20 +178,24 @@ bool	Channel::topicRestriction()
 	return true;
 }
 
-void	Channel::sendMessage(const std::string& msg, const std::string& prefix) const
+bool	Channel::sendMessage(Client *client, const std::string& msg, const std::string& prefix) const
 {
+	if (client && !isClient(*client))
+	{
+		if (!sendNumeric(client, 404, getName()))
+			return (false);
+		return (true);
+	}
 	std::map<std::string, Client *>::const_iterator	it = _clientChannelList.begin();
 	std::map<std::string, Client *>::const_iterator	end = _clientChannelList.end();
 	for (; it != end; ++it)
 	{
-//		std::cout << "Cliente: " << it->first << std::endl;
-		::sendMessage(prefix, it->second->getFd(), msg);
-		std::string	wire = ":jimmy " + msg + "\r\n";
-		if (::send(it->second->getFd(), wire.c_str(), wire.size(), 0) == -1)
-		{
-			std::cerr << "Error: send failed" << std::endl;
-			return;
-		}
+		if (client->getField("NICK") == it->second->getField("NICK"))
+			continue;
+		std::cout << "Cliente: " << it->first << std::endl;
+		if (!(::sendMessage(prefix, it->second->getFd(), msg)))
+			return (false);
 	}
+	return (true);
 }
 
