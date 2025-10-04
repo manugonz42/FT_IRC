@@ -7,6 +7,7 @@ Client::Client(int fd) : _fd(fd)
 	_nick = "*";
 	_username = "";
 	_realname = "";
+	_loginStatus = UNREGISTERED;
 }
 
 Client::~Client()

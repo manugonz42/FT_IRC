@@ -15,8 +15,7 @@ bool isValidNickname(const std::string &nick)
         return false;
     
     // Primer carácter: letra o especial
-    char first = nick[0];
-    if (!std::isalpha(first))
+    if (!std::isalpha(nick[0]) && !isSpecial(nick[0]))
         return false;
     
     // Resto: letra, dígito, especial
@@ -30,14 +29,30 @@ bool isValidNickname(const std::string &nick)
     return true;
 }
 
-bool Server::executeNick(Client *client, const ParsedCommand &cmd)
+bool isValidNickCommand(const ParsedCommand &cmd)
 {
-    // 1. Validar parámetros
     if (cmd.params.empty())
     {
         // error 461
         return false;
     }
+    if (cmd.params.size() < 2)
+    {
+        // err 431
+        return false;
+    }
+    if (cmd.params.size() > 2) {
+        // err 461
+        return false;
+    }
+    return true;
+}
+
+bool Server::executeNick(Client *client, const ParsedCommand &cmd)
+{
+    // 1. Validar cantidad de parámetros
+    if (!isValidNickCommand(cmd))
+        return false;
     
     // 2. Validar formato del nick
     if (!isValidNickname(cmd.params[1]))
@@ -48,18 +63,30 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
     // 3. Verificar si ya está en uso
     std::string upperNick = strToUpper(cmd.params[1]);
 
-    if (_clientMap.find(upperNick) != _clientMap.end())
+    std::map<std::string, Client *>::iterator it = _clientMap.find(upperNick);
+    if (it != _clientMap.end())
     {
-        if (client->getLoginStatus() < REGISTERED)
+        if (client->getLoginStatus() >= REGISTERED)
         {
-            // Durante login
-            // error 433
+            if (it->second == client)
+            {
+                client->setField("NICK", cmd.params[1]);
+                return true; // Mismo cliente, mismo nick, ignorar
+            }
+            else
+            {
+                // No puede cambiar a un nick ya en uso
+                // error 433
+                return false;
+            }
         }
         else
         {
-            // Cliente ya registrado
+            // Durante login
+            // Decidir que hacer--
             // error 433
         }
+        
         return false;
     }
     
@@ -68,9 +95,8 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
     {
         client->setField("NICK", cmd.params[1]);
         client->setLoginStatus(NICK_SENT);
-        // Verificar si puede completar registro
-        if (canCompleteRegistration(client))
-            completeRegistration(client);
+        // Añadir al mapa provisionalmente, para evitar race condition en caso de recibir otro login con el mismo NICK antes de recibir el user de este.
+        _clientMap[upperNick] = client;
         return true;
     }
     
@@ -78,13 +104,18 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
     else
     {
         std::string oldNick = client->getField("NICK");
-        client->setField("NICK", cmd.params[0]);
+        client->setField("NICK", cmd.params[1]);
+
+        // Actualizar el mapa de clientes
+        std::string oldUpperNick = strToUpper(oldNick);
+        _clientMap.erase(oldUpperNick);     
+        _clientMap[upperNick] = client;     
         
         // Notificar al cliente del cambio
-        sendMessage(client->getFd(), ":" + oldNick + " NICK " + cmd.params[0] + "\r\n");
+        //sendMessage(client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n");
         
         // Notificar a todos los canales donde está el usuario
-        notifyNickChange(client, oldNick, cmd.params[0]);
+        //notifyNickChange(client, oldNick, cmd.params[1]);
         return true;
     }
 }
