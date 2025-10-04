@@ -25,11 +25,9 @@ class Client
 		bool		isAuthenticated() const;
 		void		setField(const std::string &field, const std::string &nick);
 		void		Authenticate();
-
 		// Getters y setters
 		void		setLoginStatus(LoginStatus status);
 		LoginStatus	getLoginStatus() const;
-		
 };
 
 #endif

@@ -5,14 +5,14 @@
 class Channel
 {
 	private:
-		std::string			_name;
-		std::string			_topic;
-		std::string			_channelKey;
+		std::string						_name;
+		std::string						_topic;
+		std::string						_channelKey;
 		std::map<std::string, Client*>	_operators;
 		std::map<std::string, Client*>	_clientChannelList;
-		size_t					_limit;
-		bool				_inviteOnly;
-		bool				_topicRestriction;
+		size_t							_limit;
+		bool							_inviteOnly;
+		bool							_topicRestriction;
 
 		Channel();
 
@@ -34,8 +34,7 @@ class Channel
 		bool		makeOperator(const std::string& nick);
 		bool		inviteOnly();
 		bool		topicRestriction();
-
-		void		sendMessage(const std::string& msg) const;
-};
+		bool		sendMessage(Client *client, const std::string& msg, const std::string& prefix) const;
+	};
 
 #endif

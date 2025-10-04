@@ -210,6 +210,11 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	}
 	else if (cmd.command == "PING")
 		::sendMessage(PREFIX, client->getFd(), "PONG " + cmd.params[1]);
+	else if (cmd.command == "PRIVMSG")
+	{
+		if (client->isAuthenticated())
+			return (executePrivMsg(client, cmd));
+	}
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar

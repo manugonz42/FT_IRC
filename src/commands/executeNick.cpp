@@ -82,7 +82,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         }
         else
         {
-            // Durante login
+            // Nick usado durante login
             // Decidir que hacer--
             // error 433
         }
@@ -114,7 +114,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         // Notificar al cliente del cambio
         //sendMessage(client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n");
         
-        // Notificar a todos los canales donde está el usuario
+        // Notificar a todos los canales del cambio
         //notifyNickChange(client, oldNick, cmd.params[1]);
         return true;
     }

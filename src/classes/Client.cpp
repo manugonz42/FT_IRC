@@ -44,14 +44,22 @@ void	Client::setField(const std::string &type, const std::string &field)
 		_nick = field;
 	if (type == "USER")
 		_username = field;
+	if (type == "REAL")
+		_realname = field;
+	if (type == "HOST")
+		_hostname = field;	
 }
 
 std::string		Client::getField(const std::string &type) const
 {
 	if (type == "NICK")
 		return (_nick);
-	else
+	else if (type == "USER")
 		return (_username);
+	else if (type == "REAL")
+		return (_realname);
+	else
+		return (_hostname);	
 }
 
 bool	Client::isAuthenticated() const

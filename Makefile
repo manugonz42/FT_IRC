@@ -7,7 +7,8 @@ NAME = ircserv
 	src/utils/sendMessage.cpp\
 	src/utils/sendNumeric.cpp\
 	src/classes/Channel.cpp\
-	src/commands/executeJoin.cpp
+	src/commands/executeJoin.cpp\
+	src/commands/executePrivMsg.cpp\
 # Opción 1: Usar wildcards (automático)
 SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
 
