@@ -172,14 +172,14 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
 		} 
 	}
+	else if (!client->isAuthenticated())
+		return false;
 	else if (cmd.command == "JOIN")
-		if (client->isAuthenticated())
-			return executeJoin(client, cmd);
+		return executeJoin(client, cmd);
 	else if (cmd.command == "PING")
 		::sendMessage(PREFIX, client->getFd(), "PONG " + cmd.params[1]);
 	else if (cmd.command == "PRIVMSG")
-		if (client->isAuthenticated())
-			return (executePrivMsg(client, cmd));
+		return (executePrivMsg(client, cmd));
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar
