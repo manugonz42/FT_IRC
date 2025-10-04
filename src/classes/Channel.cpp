@@ -133,9 +133,9 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
     ::sendMessage(":server ", client.getFd(), endMsg);
 
-	std::map<std::string, Client *>::iterator	it2 = _clientChannelList.begin();
-	for (;it2 != _clientChannelList.end(); ++it2)
-		std::cout << "Cliente: " << it2->first << std::endl;
+	std::map<std::string, Client *>::iterator	it = _clientChannelList.begin();
+	for (;it != _clientChannelList.end(); ++it)
+		std::cout << "Cliente: " << it->first << std::endl;
 
     return true;
 }
