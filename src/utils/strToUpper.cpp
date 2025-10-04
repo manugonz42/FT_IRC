@@ -1,4 +1,4 @@
-#include "ircserv.hpp"
+#include "Ircserv.hpp"
 
 std::string strToUpper(const std::string& str) {
     std::string result = str;

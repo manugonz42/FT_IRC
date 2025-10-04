@@ -182,16 +182,9 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	// 	sendMessage(client->getFd(), "451 * :You have not registered");
 	// 	return (true);
 	// }
-	else if (cmd.command == "NICK") {
-		if (cmd.params.size() >= 2) {
-			std::string nick = cmd.params[1];
-			std::map<std::string, Client *>::iterator it = _clientMap.find(nick);
-			if (it != _clientMap.end())
-				nick += "2";
-			client->setField("NICK", nick);
-			std::cout << "Client " << client->getFd() << " set nick: " << nick << std::endl;
-			_clientMap.insert(std::make_pair(nick, client));
-		}
+	else if (cmd.command == "NICK") 
+	{
+		executeNick(client, cmd);
 	}
 	else if (cmd.command == "USER") {
 		if (cmd.params.size() >= 5 && client->isAuthenticated()) {
