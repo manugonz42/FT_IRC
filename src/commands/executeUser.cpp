@@ -1,5 +1,5 @@
 #include "Ircserv.hpp"
-
+/*
 bool    isValidUsername(const std::string &username)
 {
     if (!isValidLength(username, 1, 12)) // RFC sin limite max, decidir si ponerle
@@ -58,4 +58,4 @@ bool    executeUser(Client *client, const ParsedCommand &cmd)
     std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
     
     return true;
-}
+}*/
