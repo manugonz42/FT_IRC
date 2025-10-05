@@ -45,7 +45,7 @@ class Server
 		bool						executeVersion(Client *client, const ParsedCommand &cmd);
 		bool						executeTime(Client *client, const ParsedCommand &cmd);
 		bool						executeMode(Client *client, const ParsedCommand &cmd);
-
+		//bool						executeWhois(Client *client, const ParsedCommand &cmd);
 	public:
 		Server(int port, const std::string &password);
 		~Server();

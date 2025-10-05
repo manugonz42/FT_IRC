@@ -4,6 +4,7 @@
 
 bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 {
-
+	(void)client;
+	(void)cmd;
 	return true;
 }

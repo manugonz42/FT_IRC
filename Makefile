@@ -17,7 +17,7 @@ SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
 # SRC_UTILS = $(wildcard src/utils/*.cpp)
 # SRC_COMMANDS = $(wildcard src/commands/*.cpp)
 # SRC = $(SRC_MAIN) $(SRC_CLASSES) $(SRC_UTILS) $(SRC_COMMANDS)
-	src/commands/executePingPong.cpp\
+#	src/commands/executePingPong.cpp\
 
 OBJ = $(SRC:.cpp=.o)
 CC = c++
