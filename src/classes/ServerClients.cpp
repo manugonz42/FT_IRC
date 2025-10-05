@@ -209,7 +209,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 		} 
 	}
 	else if (cmd.command == "PING")
-		::sendMessage(PREFIX, client->getFd(), "PONG " + cmd.params[1]);
+		return (executePingPong(client, cmd));
 	else if (cmd.command == "PRIVMSG")
 	{
 		if (client->isAuthenticated())
