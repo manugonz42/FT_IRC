@@ -45,12 +45,6 @@ bool    isValidUsername(const std::string &username)
 bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
 {
     // Validar estado del cliente
-    if (client->getLoginStatus() < NICK_SENT)
-    {
-        // Error: debe enviar NICK válido primero
-        sendNumeric(client, 451, ":You have not registered");
-        return true;
-    }
     if (client->getLoginStatus() >= REGISTERED)
     {
         // Error 462: You may not reregister
@@ -58,7 +52,7 @@ bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
         return true;
     }
 
-    // Obtener nick (ya validado por NICK_SENT)
+    // Para el mensaje
     std::string nick = client->getField("NICK");
 
     // 1. Validar cantidad de parámetros
@@ -91,38 +85,13 @@ bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
     client->setField("USER", username);
     client->setField("HOST", host); // usar DNS reverse?
     client->setField("REAL", realname);
-    client->setLoginStatus(REGISTERED);
-    
-    // Enviar welcome messages con colores IRC
-    ::sendMessage(PREFIX, client->getFd(),
-    std::string(BOLD) + BRIGHT_GREEN +
-    "001 " + nick + " :Welcome to " +
-    BRIGHT_CYAN + BOLD + "the.best.of.the.world.irc.server" +
-    RESET + BRIGHT_GREEN + ", " + nick +
-    "! Connection established successfully." +
-    RESET);
-
-::sendMessage(PREFIX, client->getFd(),
-    std::string(BOLD) + BRIGHT_GREEN +
-    "002 " + nick + " :Your host is " +
-    BRIGHT_CYAN + BOLD + "ft_irc" +
-    RESET + BRIGHT_GREEN + ", running version " +
-    WHITE + BOLD + "1.0" +
-    RESET + BRIGHT_GREEN + "." +
-    RESET);
-
-::sendMessage(PREFIX, client->getFd(),
-    std::string(BOLD) + BRIGHT_GREEN +
-    "003 " + nick + " :This server was built for " +
-    BRIGHT_CYAN + BOLD + "clear communication" +
-    RESET + BRIGHT_GREEN + " and reliable connections." +
-    RESET);
-
-std::cout << GREEN << "[SUCCESS] " << RESET
-          << "Client " << BOLD << BLUE << client->getFd() << RESET
-          << " fully registered as " << BOLD << MAGENTA << nick << RESET
-          << BRIGHT_GREEN << " ✅" << RESET << std::endl;
-
+    if (client->getLoginStatus() == NICK_SENT)
+    {
+        client->setLoginStatus(REGISTERED);
+        sendWelcome(client);
+    }
+    else
+        client->setLoginStatus(USER_SENT);
     
     return true;
 }

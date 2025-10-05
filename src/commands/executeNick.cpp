@@ -5,7 +5,7 @@
 bool isSpecial(char c) 
 { 
     return c == '[' || c == ']' || c == '\\' || c == '`' || 
-           c == '-' || c == '^' || c == '{' || c == '}'; 
+           c == '-' || c == '^' || c == '{' || c == '}' || c == '_'; 
 }
 
 // Función para validar el formato del nick
@@ -57,7 +57,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
     // 2. Validar formato del nick
     if (!isValidNickname(cmd.params[1]))
     {
-        sendNumeric(client, 432, cmd.params[1] + " :Erroneous nickname");
+        sendNumeric(client, 432, cmd.params[1]);
         return false;
     }
     // 3. Verificar si ya está en uso
@@ -76,7 +76,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
             else
             {
                 // No puede cambiar a un nick ya en uso
-                sendNumeric(client, 433, cmd.params[1] + " :Nickname is already in use");
+                sendNumeric(client, 433, cmd.params[1]);
                 return false;
             }
         }
@@ -84,19 +84,27 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         {
             // Nick usado durante login
             // Decidir que hacer--
-            sendNumeric(client, 433, cmd.params[1] + " :Nickname is already in use");
+            sendNumeric(client, 433, cmd.params[1]);
+            return true;
         }
         
-        return false;
+        return true;
     }
     
     // 4. Durante LOGIN
     if (client->getLoginStatus() < REGISTERED)
     {
         client->setField("NICK", cmd.params[1]);
-        client->setLoginStatus(NICK_SENT);
         // Añadir al mapa provisionalmente, para evitar race condition en caso de recibir otro login con el mismo NICK antes de recibir el user de este.
         _clientMap[upperNick] = client;
+        if (client->getLoginStatus() == USER_SENT)
+        {
+            client->setLoginStatus(REGISTERED);
+            sendWelcome(client);
+            return true;
+        }
+        client->setLoginStatus(NICK_SENT);
+        
         return true;
     }
     

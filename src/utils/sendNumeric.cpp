@@ -59,7 +59,7 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 				return (0);
 			break;
 		case 433:
-			if (!::sendMessage(PREFIX, client->getFd(), "433 " + client->getField("NICK") + " :" + target + " :Nickname is already in use"))
+			if (!::sendMessage(PREFIX, client->getFd(), "433 " + client->getField("NICK") + " " + target + " :Nickname is already in use"))
 				return (0);
 			break;
 		case 451:

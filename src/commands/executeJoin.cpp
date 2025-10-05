@@ -14,8 +14,11 @@
 static bool	isValid(const std::string& channel)
 {
     if (channel.empty() || channel[0] != '#')
+	{
+		std::cout << "Canal inválido: debe comenzar con '#'" << std::endl;
         return false;
-    return true;
+    }
+	return true;
 }
 
 std::vector<std::string> parseChannels(const std::string& channelParam) {
@@ -60,6 +63,7 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 	{
 		if (!isValid(channels[i]))
 		{
+			sendNumeric(client, 403, channels[i]);
 			return true;
 		}
 	}
