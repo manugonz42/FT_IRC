@@ -30,10 +30,11 @@ bool	Server::executeNotice(Client *client, const ParsedCommand &cmd)
 	else
 	{
 		std::map<std::string, Client *>::iterator i;
-		i = _clientMap.find(cmd.params[1]);
+		i = _clientMap.find(strToUpper(cmd.params[1]));
 		if (i == _clientMap.end())
 			return (true);
-		::sendMessage(prefix, i->second->getFd(), "NOTICE " + text);
+		if (!::sendMessage(prefix, i->second->getFd(), "NOTICE " + text))
+			return (false);
 	}
 	return (true);
 }

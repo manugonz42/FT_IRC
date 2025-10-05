@@ -51,14 +51,15 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 	else
 	{
 		std::map<std::string, Client *>::iterator i;
-		i = _clientMap.find(cmd.params[1]);
+		i = _clientMap.find(strToUpper(cmd.params[1]));
 		if (i == _clientMap.end())
 		{
 			if (!sendNumeric(client, 401, cmd.params[1]))
 				return(false);
 			return (true);
 		}
-		::sendMessage(prefix, i->second->getFd(), "PRIVMSG " + text);
+		if (!::sendMessage(prefix, i->second->getFd(), "PRIVMSG " + text))
+			return (false);
 	}
 	return (true);
 }
