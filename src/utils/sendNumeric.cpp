@@ -38,6 +38,10 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			if (!::sendMessage(PREFIX, client->getFd(), "401 " + client->getField("NICK") + " :" + target))
 				return (0);
 			break;
+		case 403:
+			if (!::sendMessage(PREFIX, client->getFd(), "403 " + client->getField("NICK") + " :" + target))
+				return (0);
+			break;
 		case 404:
 			if (!::sendMessage(PREFIX, client->getFd(), "404 " + client->getField("NICK") + " :" + target))
 				return (0);
@@ -76,6 +80,10 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			break;
 		case 464:
 			if (!::sendMessage(PREFIX, client->getFd(), "464 " + client->getField("NICK") + " :Password Incorrect"))
+				return (0);
+			break;
+		case 461:
+			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " :Not enough parameters"))
 				return (0);
 			break;
 		default:
