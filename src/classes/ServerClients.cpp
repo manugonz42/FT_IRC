@@ -185,6 +185,7 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	else if (cmd.command == "NICK") 
 	{
 		executeNick(client, cmd);
+		return true;
 	}
 	else if (cmd.command == "USER") {
 		if (cmd.params.size() >= 5 && client->isAuthenticated()) {
