@@ -90,9 +90,8 @@ void	Server::processClientsInput()
 				// Aquí se procesaría el comando válido
 
 				std::cout << "Client[" << _clientList[client]->getFd() << "] -> " << cmd.command;
-				if (!cmd.params.empty()) {
+				if (!cmd.params.empty())
 					std::cout << " (params: " << cmd.params.size() << ")";
-				}
 				std::cout << std::endl;
 				if (!processCommand(_clientList[client], cmd))
 				{
@@ -102,20 +101,6 @@ void	Server::processClientsInput()
 					break; // Tiene que haber break aqui, si no, intenta leer de un cliente inexistente
 				//	clientDisconnected = true;
 				}
-				// IMPLEMENTACIÓN ANTERIOR 
-				/*
-			//	if (line == "CAP LS 302")
-			//		sendMessage(_clientList[client]->getFd(), ":best.super.server.ever CAP * LS :");
-			//	ejecutarComando()
-				if (!wellcome(_clientList[client], line))
-				{
-					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
-					_pollFds.erase(_pollFds.begin() + i);
-					removeClient(client);
-					break;
-				}
-				std::cout << "Client[" << _clientList[client]->getFd() <<"]: " << line << std::endl;
-				*/
 			}
 		}
 		//if (!clientDisconnected)
@@ -146,6 +131,8 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			::sendMessage(PREFIX, client->getFd(), "CAP * ACK :");
 		}
 	}
+	else if (cmd.command == "JOIN")
+		return executeJoin(client, cmd);
 	else if (cmd.command == "PASS") {
 		if (cmd.params.size() >= 2) {
 			std::string password = cmd.params[1];
@@ -167,27 +154,6 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 		// Enviar error 451 "You have not registered"
 		return true;
 	}
-	else if (cmd.command == "JOIN")
-	{
-	/*	int error = 0;
-		socklen_t len = sizeof(error);
-		int result = getsockopt(client->getFd(), SOL_SOCKET, SO_ERROR, &error, &len);
-		if (result != 0 || error != 0)
-		{
-			std::cout << "ERROR: Socket is not valid! getsockopt result: " << result << " error result: " << error << std::endl;
-			return false;
-		}
-		else
-			std::cout << "No hay error con el Socket" << std::endl;*/
-		if (client->isAuthenticated())
-			return executeJoin(client, cmd);
-		return true;
-	}
-	// else if (!client->isAuthenticated())
-	// {
-	// 	sendMessage(client->getFd(), "451 * :You have not registered");
-	// 	return (true);
-	// }
 	else if (cmd.command == "NICK") 
 	{
 		executeNick(client, cmd);
@@ -208,20 +174,16 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
 		} 
 	}
+	else if (!client->isAuthenticated())
+		return false;
 	else if (cmd.command == "PING")
-		::sendMessage(PREFIX, client->getFd(), "PONG " + cmd.params[1]);
+		return (executePingPong(client, cmd));
 	else if (cmd.command == "PRIVMSG")
-	{
-		if (client->isAuthenticated())
-			return (executePrivMsg(client, cmd));
-	}
+		return (executePrivMsg(client, cmd));
 	else if (cmd.command == "QUIT") {
 		std::cout << "Client " << client->getFd() << " quit" << std::endl;
 		return false; // Desconectar
 	}
-//	std::map<std::string, Channel *>::iterator	it = _channelMap.find("#ubuntu");
-//	if (it != _channelMap.end())
-//		it->second->sendMessage("!jimmy@host PRIVMSG #ubuntu :Hola mundo");
 	return true; // Mantener conexión
 }
 
