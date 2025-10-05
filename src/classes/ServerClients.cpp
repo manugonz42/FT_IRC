@@ -161,6 +161,12 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			}
 		}
 	}
+	else if (!client->isAuthenticated())
+	{
+		// Error: debe enviar PASS válido primero
+		// Enviar error 451 "You have not registered"
+		return true;
+	}
 	else if (cmd.command == "JOIN")
 	{
 	/*	int error = 0;

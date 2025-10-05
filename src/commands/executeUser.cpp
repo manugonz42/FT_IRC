@@ -1,5 +1,20 @@
 #include "Ircserv.hpp"
 
+bool    isValidUsername(const std::string &username)
+{
+    if (!isValidLength(username, 1, 12)) // RFC sin limite max, decidir si ponerle
+        return false;
+    
+    for (size_t i = 0; i < username.length(); i++)
+    {
+        char c = username[i];
+        if (c <= 32 || c == 127 || c == '@') // Caracteres no permitidos
+            return false;
+    }
+    
+    return true;
+}
+
 bool    executeUser(Client *client, const ParsedCommand &cmd)
 {
     // Validar estado del cliente
@@ -21,6 +36,9 @@ bool    executeUser(Client *client, const ParsedCommand &cmd)
         // Error 461: Not enough parameters
         return true;
     }
+
+    // Validar formato de los parámetros
+    
     
     std::string username = cmd.params[1];
     std::string host = cmd.params[2];
@@ -28,7 +46,7 @@ bool    executeUser(Client *client, const ParsedCommand &cmd)
     
     // Completar registro
     client->setField("USER", username);
-    client->setField("HOST", host);
+    client->setField("HOST", host); // usar DNS reverse?
     client->setField("REAL", realname);
     client->setLoginStatus(REGISTERED);
     
