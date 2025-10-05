@@ -53,7 +53,8 @@ std::vector<std::string> parseChannels(const std::string& channelParam) {
 bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 {
 //	cmd[1] = nombre del canal;
-	if (cmd.params.size() < 2)
+//  revisarlo y decidir si es válido así (prueba del cliente)
+	if (cmd.params.size() < 2 || (cmd.params.size() == 2 && cmd.params[1] == ":"))
         return true;
 
 	std::vector<std::string> channels = parseChannels(cmd.params[1]);
