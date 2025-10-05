@@ -131,6 +131,8 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 			::sendMessage(PREFIX, client->getFd(), "CAP * ACK :");
 		}
 	}
+	else if (cmd.command == "JOIN")
+		return executeJoin(client, cmd);
 	else if (cmd.command == "PASS") {
 		if (cmd.params.size() >= 2) {
 			std::string password = cmd.params[1];
@@ -174,8 +176,6 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	}
 	else if (!client->isAuthenticated())
 		return false;
-	else if (cmd.command == "JOIN")
-		return executeJoin(client, cmd);
 	else if (cmd.command == "PING")
 		return (executePingPong(client, cmd));
 	else if (cmd.command == "PRIVMSG")

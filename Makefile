@@ -9,6 +9,7 @@ SRC = src/main.cpp\
 	src/classes/Channel.cpp\
 	src/commands/executeJoin.cpp\
 	src/commands/executePrivMsg.cpp\
+	src/commands/executePingPong.cpp\
 
 OBJ = $(SRC:.cpp=.o)
 CC = c++
