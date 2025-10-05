@@ -32,7 +32,6 @@
 
 int	sendNumeric(Client *client, int numeric, const std::string &target)
 {
-
 	switch (numeric)
 	{
 		case 401:
@@ -49,6 +48,30 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			break;
 		case 412:
 			if (!::sendMessage(PREFIX, client->getFd(), "412 " + client->getField("NICK") + " :No text to send"))
+				return (0);
+			break;
+		case 431:
+			if (!::sendMessage(PREFIX, client->getFd(), "431 " + client->getField("NICK") + " :No nickname given"))
+				return (0);
+			break;
+		case 432:
+			if (!::sendMessage(PREFIX, client->getFd(), "432 " + client->getField("NICK") + " :" + target + " :Erroneous nickname"))
+				return (0);
+			break;
+		case 433:
+			if (!::sendMessage(PREFIX, client->getFd(), "433 " + client->getField("NICK") + " :" + target + " :Nickname is already in use"))
+				return (0);
+			break;
+		case 451:
+			if (!::sendMessage(PREFIX, client->getFd(), "451 " + client->getField("NICK") + " :You have not registered"))
+				return (0);
+			break;
+		case 461:
+			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " :" + target + " :Not enough parameters"))
+				return (0);
+			break;
+		case 462:
+			if (!::sendMessage(PREFIX, client->getFd(), "462 " + client->getField("NICK") + " :Unauthorized command (already registered)"))
 				return (0);
 			break;
 		case 464:

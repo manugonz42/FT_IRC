@@ -29,20 +29,20 @@ bool isValidNickname(const std::string &nick)
     return true;
 }
 
-bool isValidNickCommand(const ParsedCommand &cmd)
+bool isValidNickCommand(Client *client, const ParsedCommand &cmd)
 {
     if (cmd.params.empty())
     {
-        // error 461
+        sendNumeric(client, 431, ":No nickname given");
         return false;
     }
     if (cmd.params.size() < 2)
     {
-        // err 431
+        sendNumeric(client, 431, ":No nickname given");
         return false;
     }
     if (cmd.params.size() > 2) {
-        // err 461
+        sendNumeric(client, 461, ":Too many parameters");
         return false;
     }
     return true;
@@ -51,13 +51,13 @@ bool isValidNickCommand(const ParsedCommand &cmd)
 bool Server::executeNick(Client *client, const ParsedCommand &cmd)
 {
     // 1. Validar cantidad de parámetros
-    if (!isValidNickCommand(cmd))
+    if (!isValidNickCommand(client, cmd))
         return false;
     
     // 2. Validar formato del nick
     if (!isValidNickname(cmd.params[1]))
     {
-        // error 432
+        sendNumeric(client, 432, cmd.params[1] + " :Erroneous nickname");
         return false;
     }
     // 3. Verificar si ya está en uso
@@ -76,7 +76,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
             else
             {
                 // No puede cambiar a un nick ya en uso
-                // error 433
+                sendNumeric(client, 433, cmd.params[1] + " :Nickname is already in use");
                 return false;
             }
         }
@@ -84,7 +84,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         {
             // Nick usado durante login
             // Decidir que hacer--
-            // error 433
+            sendNumeric(client, 433, cmd.params[1] + " :Nickname is already in use");
         }
         
         return false;
@@ -112,7 +112,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         _clientMap[upperNick] = client;     
         
         // Notificar al cliente del cambio
-        //sendMessage(client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n");
+        ::sendMessage(PREFIX, client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n");
         
         // Notificar a todos los canales del cambio
         //notifyNickChange(client, oldNick, cmd.params[1]);

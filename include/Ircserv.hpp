@@ -16,6 +16,7 @@
 # include <cstdlib>
 # include <fcntl.h>
 # include <map>
+# include "Colors.hpp"
 # include "Defines.hpp"
 # include "Structures.hpp"
 # include "Client.hpp"
@@ -26,6 +27,7 @@
 
 
 std::string strToUpper(const std::string& str);
+bool isValidLength(const std::string &str, size_t minLen, size_t maxLen);
 
 int	sendMessage(std::string prefix, int fd ,const std::string &msg);
 int	sendNumeric(Client *client, int numeric, const std::string &target);

@@ -159,20 +159,16 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 		executeNick(client, cmd);
 		return true;
 	}
-	else if (cmd.command == "USER") {
-		if (cmd.params.size() >= 5 && client->isAuthenticated()) {
-			std::string username = cmd.params[1];
-			std::string realname = cmd.params[4]; // :Real Name
-			client->setField("USER", username);
-			
-			// Enviar welcome messages
-			std::string nick = client->getField("NICK");
-			::sendMessage(PREFIX, client->getFd(), "001 " + nick + " :Welcome to the IRC Network " + nick + "!");
-			::sendMessage(PREFIX, client->getFd(), "002 " + nick + " :Your host is server, running version 1.0");
-			::sendMessage(PREFIX, client->getFd(), "004 " + nick + " server 1.0");
-			
-			std::cout << "Client " << client->getFd() << " fully registered as " << nick << std::endl;
-		} 
+	else if (cmd.command == "USER")
+	{
+		executeUser(client, cmd);
+		return true;
+	}
+	else if (client->getLoginStatus() < REGISTERED)
+	{
+		// Error: debe completar registro con NICK y USER
+		// Enviar error 451 "You have not registered"
+		return true;
 	}
 	else if (!client->isAuthenticated())
 		return false;
