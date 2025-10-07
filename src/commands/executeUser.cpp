@@ -48,7 +48,7 @@ bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
     if (client->getLoginStatus() >= REGISTERED)
     {
         // Error 462: You may not reregister
-        sendNumeric(client, 462, ":Unauthorized command (already registered)");
+        sendNumeric(client, 462, "");
         return true;
     }
 

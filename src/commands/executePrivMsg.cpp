@@ -3,7 +3,11 @@
 static int	commandIsValid(Client *client, const ParsedCommand &cmd)
 {
 	if (cmd.params.size() <= 1)
-		return (sendNumeric(client, 461, ""));
+	{
+		if (!sendNumeric(client, 461, ""))
+			return (-1);
+		return (0);
+	}
 	if (cmd.params.size() != 3)
 	{
 		if (cmd.params[1][0] == ':')
