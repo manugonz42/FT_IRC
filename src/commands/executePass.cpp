@@ -20,8 +20,6 @@ bool	Server::executePass(Client *client, const ParsedCommand &cmd)
 		}
 	}
 	else
-	{
 		return (sendNumeric(client, 461, ""));
-	}
 	return (true);
 }
