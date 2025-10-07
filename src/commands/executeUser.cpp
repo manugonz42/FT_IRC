@@ -45,7 +45,7 @@ bool    isValidUsername(const std::string &username)
 bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
 {
     // Validar estado del cliente
-    if (client->getLoginStatus() >= REGISTERED)
+    if (client->getLoginStatus() >= USER_SENT)
     {
         // Error 462: You may not reregister
         sendNumeric(client, 462, ":Unauthorized command (already registered)");
