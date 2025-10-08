@@ -5,7 +5,11 @@ void	Server::removeClient(size_t i)
 	if (i >= _clientList.size())
 		return;
 	shutdown(_clientList[i]->getFd(), SHUT_WR);
-	_clientMap.erase(strToUpper(_clientList[i]->getField("NICK")));
+	std::string clientNick = _clientList[i]->getField("NICK");
+	std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+	for (;it != _channelMap.end(); it++)
+		it->second->removeClient(clientNick, "");
+	_clientMap.erase(strToUpper(clientNick));
 	if (_clientList[i] != NULL)
 		delete _clientList[i];
 	_clientList.erase(_clientList.begin() + i);
@@ -113,6 +117,7 @@ void	Server::processClientsInput()
 			i++;
 	}
 }
+
 
 // processCommand para testing del parser
 bool Server::processCommand(Client *client, const ParsedCommand &cmd)
