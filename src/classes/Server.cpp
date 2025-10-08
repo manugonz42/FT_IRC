@@ -4,6 +4,7 @@ Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _p
 {
 	_running = true;
 	_serverName = ":server";
+	fillCommandMap();
 }
 
 Server::~Server()
@@ -14,6 +15,20 @@ Server::~Server()
 		close(_fd);
 		_fd = -1;
 	}
+}
+
+void Server::fillCommandMap()
+{
+	_commandMap["CAP"] = &executeCap;
+	_commandMap["JOIN"] = &executeJoin;
+	_commandMap["KICK"] = &executeKick;
+	_commandMap["MODE"] = &executeMode;
+	_commandMap["NICK"] = &executeNick;
+	_commandMap["NOTICE"] = &executeNotice;
+	_commandMap["PASS"] = &executePass;
+	_commandMap["PING"] = &executePingPong;
+	_commandMap["PRIVMSG"] = &executePrivMsg;
+	_commandMap["USER"] = &executeUser;
 }
 
 int		Server::getFd()
@@ -119,4 +134,3 @@ void	Server::run()
 		processClientsInput();
 	}
 }
-

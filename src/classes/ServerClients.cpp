@@ -5,6 +5,11 @@ void	Server::removeClient(size_t i)
 	if (i >= _clientList.size())
 		return;
 	shutdown(_clientList[i]->getFd(), SHUT_WR);
+	std::string clientNick = _clientList[i]->getField("NICK");
+	std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+	for (;it != _channelMap.end(); it++)
+		it->second->removeClient(clientNick, "");
+	_clientMap.erase(strToUpper(clientNick));
 	if (_clientList[i] != NULL)
 		delete _clientList[i];
 	_clientList.erase(_clientList.begin() + i);
@@ -113,6 +118,7 @@ void	Server::processClientsInput()
 	}
 }
 
+
 // processCommand para testing del parser
 bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 {
@@ -122,39 +128,21 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	}
 	
 	// Manejar comandos básicos para irssi
-	if (cmd.command == "CAP") {
-		if (cmd.params.size() >= 2 && cmd.params[1] == "LS") {
-			// Responder a CAP LS - no ofrecemos capabilities
-			::sendMessage(PREFIX, client->getFd(), "CAP * LS :");
-		} else if (cmd.params.size() >= 2 && cmd.params[1] == "END") {
-			// Cliente termina negociación de capabilities
-			::sendMessage(PREFIX, client->getFd(), "CAP * ACK :");
-		}
-	}
+	if (cmd.command == "CAP")
+		return (executeCap(client, cmd));
 	else if (cmd.command == "JOIN")
-		return executeJoin(client, cmd);
+		return (executeJoin(client, cmd));
 	else if (cmd.command == "MODE")
 		return executeMode(client, cmd);
-	else if (cmd.command == "PASS") {
-		if (cmd.params.size() >= 2) {
-			std::string password = cmd.params[1];
-			if (password == _password)
-			{
-				client->Authenticate();
-				std::cout << "Client " << client->getFd() << " authenticated" << std::endl;
-			}
-			else
-			{
-				sendNumeric(client, 464, "");
-				return false; // Desconectar
-			}
-		}
+	else if (cmd.command == "PASS")
+	{
+		return (executePass(client, cmd));
 	}
 	else if (!client->isAuthenticated())
 	{
 		// Error: debe enviar PASS válido primero
-		// Enviar error 451 "You have not registered"
-		return true;
+		sendNumeric(client, 464, "");
+		return false;
 	}
 	else if (cmd.command == "NICK") 
 	{
@@ -172,8 +160,6 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 		// Enviar error 451 "You have not registered"
 		return true;
 	}
-	else if (!client->isAuthenticated())
-		return false;
 	else if (cmd.command == "PING")
 		return (executePingPong(client, cmd));
 	else if (cmd.command == "PRIVMSG")

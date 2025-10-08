@@ -75,11 +75,11 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 				return (0);
 			break;
 		case 462:
-			if (!::sendMessage(PREFIX, client->getFd(), "462 " + client->getField("NICK") + " :Unauthorized command (already registered)"))
+			if (!::sendMessage(PREFIX, client->getFd(), "462 " + client->getField("NICK") + " :You may not reregister"))
 				return (0);
 			break;
 		case 464:
-			if (!::sendMessage(PREFIX, client->getFd(), "464 " + client->getField("NICK") + " :Password Incorrect"))
+			if (!::sendMessage(PREFIX, client->getFd(), "464 " + client->getField("NICK") + " :" + RED + "Password Incorrect" + RESET))
 				return (0);
 			break;
 
