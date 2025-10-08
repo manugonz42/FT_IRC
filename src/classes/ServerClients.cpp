@@ -5,6 +5,7 @@ void	Server::removeClient(size_t i)
 	if (i >= _clientList.size())
 		return;
 	shutdown(_clientList[i]->getFd(), SHUT_WR);
+	_clientMap.erase(strToUpper(_clientList[i]->getField("NICK")));
 	if (_clientList[i] != NULL)
 		delete _clientList[i];
 	_clientList.erase(_clientList.begin() + i);

@@ -50,7 +50,8 @@ bool	Server::executePrivMsg(Client *client, const ParsedCommand &cmd)
 			return (true);
 		}
 		Channel *channel = i->second;
-		channel->sendMessage(client, "PRIVMSG " + text, prefix);
+		if (!channel->sendMessage(client, "PRIVMSG " + text, prefix))
+			return (false);
 	}
 	else
 	{
