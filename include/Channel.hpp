@@ -33,9 +33,11 @@ class Channel
 		bool		addClient(const Client& client, bool isOperator);
 		bool		removeClient(const std::string& username, const std::string& msg);
 		bool		changeKey(const std::string& key);
+		bool		changeLimit(const std::string& limit);
 		bool		makeOperator(const std::string& nick);
-		bool		inviteOnly();
-		bool		topicRestriction();
+		bool		removeOperator(const std::string& nick);
+		bool		inviteOnly(bool inviteOnly);
+		bool		topicRestriction(bool topicRestriction);
 		bool		sendMessage(Client *client, const std::string& msg, const std::string& prefix) const;
 	};
 

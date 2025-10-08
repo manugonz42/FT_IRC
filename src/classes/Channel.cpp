@@ -122,8 +122,9 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     
     // 1. Confirmar JOIN al cliente
     std::string joinMsg = nick + "!user@host JOIN " + channelName;
-    ::sendMessage(":server " ,client.getFd(), joinMsg);
-    
+    std::map<std::string, Client *>::const_iterator it = _clientChannelList.begin();
+    for (; it != _clientChannelList.end(); ++it)
+        ::sendMessage(":", it->second->getFd(), joinMsg);
     
     // 2. Enviar lista de usuarios (RPL_NAMREPLY)
     std::string namesMsg = "353 " + nick + " = " + channelName + " :" + getClients();
@@ -132,10 +133,6 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
     // 3. Fin de la lista (RPL_ENDOFNAMES)
     std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
     ::sendMessage(":server ", client.getFd(), endMsg);
-	
-	std::string msg = "";
-	msg = client.getField("NICK") + " has joined " + getName();
-	this->sendMessage(const_cast<Client *>(&client), msg, PREFIX);
 
     return true;
 }
@@ -157,24 +154,47 @@ bool	Channel::changeKey(const std::string& key)
 	return true;
 }
 
+bool	Channel::changeLimit(const std::string& limit)
+{
+	(void) limit;
+	return true;
+}
+
 bool	Channel::makeOperator(const std::string& nick)
 {
 	std::map<std::string, Client *>::iterator	it = _clientChannelList.find(nick);
 	if (it == _clientChannelList.end())
+	{
+		//error, cant make an operator as it is not a member
 		return false;
+	}
 	this->_operators[nick] = it->second;
+	std::cout << nick << " is now an operator of " << getName();
 	return true;
 }
 
-bool	Channel::inviteOnly()
+bool	Channel::removeOperator(const std::string& nick)
 {
-	_inviteOnly = !_inviteOnly;
+	std::map<std::string, Client *>::iterator	it = _operators.find(nick);
+	if (it == _operators.end())
+	{
+		//error, member is not an operator
+		return false;
+	}
+	_operators.erase(it);
+	std::cout << nick << " is no longer an operator of " << getName();
 	return true;
 }
 
-bool	Channel::topicRestriction()
+bool	Channel::inviteOnly(bool inviteOnly)
 {
-	_topicRestriction = !_topicRestriction;
+	_inviteOnly = inviteOnly;
+	return true;
+}
+
+bool	Channel::topicRestriction(bool topicRestriction)
+{
+	_topicRestriction = topicRestriction;
 	return true;
 }
 
@@ -190,9 +210,8 @@ bool	Channel::sendMessage(Client *client, const std::string& msg, const std::str
 	std::map<std::string, Client *>::const_iterator	end = _clientChannelList.end();
 	for (; it != end; ++it)
 	{
-		if (client->getField("NICK") == it->second->getField("NICK"))
+		if (client && client->getField("NICK") == it->second->getField("NICK"))
 			continue;
-		std::cout << "Cliente: " << it->first << std::endl;
 		if (!(::sendMessage(prefix, it->second->getFd(), msg)))
 			return (false);
 	}

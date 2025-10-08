@@ -24,12 +24,10 @@ static bool	isValid(const std::string& channel)
 std::vector<std::string> parseChannels(const std::string& channelParam) {
     std::vector<std::string> channels;
     
-    if (channelParam.empty()) {
+    if (channelParam.empty())
         return channels;
-    }
     
     std::string current = "";
-    
     for (size_t i = 0; i < channelParam.length(); ++i) {
         char c = channelParam[i];
         
@@ -42,10 +40,9 @@ std::vector<std::string> parseChannels(const std::string& channelParam) {
             current += c;
         
     }
-    
-    if (!current.empty()) {
+
+    if (!current.empty())
         channels.push_back(current);
-    }
     
     return channels;
 }
@@ -59,6 +56,8 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 
 	std::vector<std::string> channels = parseChannels(cmd.params[1]);
 	
+	if (channels.empty())
+		return true;
 	// Validar cada canal del vector
 	for (size_t i = 0; i < channels.size(); ++i)
 	{
@@ -67,10 +66,6 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 			sendNumeric(client, 403, channels[i]);
 			return true;
 		}
-	}
-	
-	if (channels.empty()) {
-		return true;
 	}
 	
 	// Procesar solo el primer canal (filtro temporal)

@@ -133,6 +133,8 @@ bool Server::processCommand(Client *client, const ParsedCommand &cmd)
 	}
 	else if (cmd.command == "JOIN")
 		return executeJoin(client, cmd);
+	else if (cmd.command == "MODE")
+		return executeMode(client, cmd);
 	else if (cmd.command == "PASS") {
 		if (cmd.params.size() >= 2) {
 			std::string password = cmd.params[1];
