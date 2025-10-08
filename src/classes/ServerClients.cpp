@@ -98,7 +98,7 @@ void	Server::processClientsInput()
 				if (!cmd.params.empty())
 					std::cout << " (params: " << cmd.params.size() << ")";
 				std::cout << std::endl;
-				if (!processCommand(_clientList[client], cmd))
+				if (!executeCommand(_clientList[client], cmd))
 				{
 					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 					_pollFds.erase(_pollFds.begin() + i);

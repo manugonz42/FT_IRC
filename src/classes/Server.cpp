@@ -19,16 +19,16 @@ Server::~Server()
 
 void Server::fillCommandMap()
 {
-	_commandMap["CAP"] = &executeCap;
-	_commandMap["JOIN"] = &executeJoin;
-	_commandMap["KICK"] = &executeKick;
-	_commandMap["MODE"] = &executeMode;
-	_commandMap["NICK"] = &executeNick;
-	_commandMap["NOTICE"] = &executeNotice;
-	_commandMap["PASS"] = &executePass;
-	_commandMap["PING"] = &executePingPong;
-	_commandMap["PRIVMSG"] = &executePrivMsg;
-	_commandMap["USER"] = &executeUser;
+	_commandMap["CAP"] = &Server::executeCap;
+	_commandMap["JOIN"] = &Server::executeJoin;
+	_commandMap["KICK"] = &Server::executeKick;
+	_commandMap["MODE"] = &Server::executeMode;
+	_commandMap["NICK"] = &Server::executeNick;
+	_commandMap["NOTICE"] = &Server::executeNotice;
+	_commandMap["PASS"] = &Server::executePass;
+	_commandMap["PING"] = &Server::executePingPong;
+	_commandMap["PRIVMSG"] = &Server::executePrivMsg;
+	_commandMap["USER"] = &Server::executeUser;
 }
 
 int		Server::getFd()
