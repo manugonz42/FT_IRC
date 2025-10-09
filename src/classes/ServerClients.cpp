@@ -35,6 +35,12 @@ void	Server::acceptNewClient()
 		struct sockaddr_in	addr;
 		socklen_t			len = sizeof(addr);
 		int	clientFd = accept(_fd, (struct sockaddr *)&addr, &len);
+		if (_pollFds.size() >= 1020)
+		{
+			::sendMessage(PREFIX, clientFd, "Server is full. Please wait...");
+			close(clientFd);
+			return ;
+		}
 		if (clientFd < 0)
 			std::cerr << "Error: accept failed" << std::endl;
 		else
