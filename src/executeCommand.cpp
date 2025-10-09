@@ -11,7 +11,7 @@ bool	Server::executeCommand(Client *client, const ParsedCommand &cmd)
 		if (it->first != "PASS" && it->first != "CAP" && it->first != "JOIN" && !client->isAuthenticated())
 		{
 			sendNumeric(client, 464, "");
-			return false;
+			return (false);
 		}
 		return ((this->*(it->second))(client, cmd));
 	}
