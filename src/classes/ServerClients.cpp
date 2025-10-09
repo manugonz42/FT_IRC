@@ -38,6 +38,7 @@ void	Server::acceptNewClient()
 		if (_pollFds.size() >= 1020)
 		{
 			::sendMessage(PREFIX, clientFd, "Server is full. Please wait...");
+			std::cerr << "Client disconnected: " << clientFd << std::endl;
 			close(clientFd);
 			return ;
 		}
