@@ -34,7 +34,8 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 	int	numParams = cmd.params.size();
 	if (numParams < 2)
 	{
-		// not enough parameters
+		if (!sendNumeric(client, 461, "MODE"))
+			return false;
 		return true;
 	}
 	if (cmd.params[1][0] == '#')
@@ -44,14 +45,22 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(cmd.params[1]);
 		if (it == _channelMap.end())
 		{
-			//error no such channel name
+			if (!sendNumeric(client, 403, cmd.params[1]))
+				return false;
 			return true;
 		}
+		std::string prefix = "";
+		std::string modeMsg = "";
 
 		if (numParams < 3)
 		{
-			// Show current channel modes
-			return true; 	
+			prefix += PREFIX;
+			modeMsg += "324 " + client->getField("NICK") + " " + it->second->getName() + " +";
+			std::string modes = it->second->getModes();
+			if (!modes.empty()) modeMsg += modes;
+			std::string parameters = it->second->getParameters();
+			if (!parameters.empty()) modeMsg += " " + parameters;
+			return ::sendMessage(prefix, client->getFd(), modeMsg); 	
 		}
 
 		int	requiredParams = countRequiredParams(cmd.params[2]);
@@ -59,13 +68,15 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 
 		if (!it->second->isOperator(*client))
 		{
-			//error you are not an operator
+			if (!sendNumeric(client, 482, cmd.params[1]))
+				return false;
 			return true;
 		}
 
 		if (availableParams < requiredParams)
 		{
-			//error not enough parameters
+			if (!sendNumeric(client, 461, "MODE"))
+				return false;
 			return true;
 		}
 
@@ -133,7 +144,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 						paramIt++;
 					}
 					else
-						it->second->changeLimit("-1");
+						it->second->changeLimit("0");
 
 					break;
 				case 'i':
@@ -157,8 +168,8 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 
 		if (!modeChanges.empty())
 		{
-			std::string prefix = ":" + client->getField("NICK") + "!user@host ";
-			std::string modeMsg = "MODE " + cmd.params[1] + " " + modeChanges;
+			prefix = ":" + client->getField("NICK") + "!user@host ";
+			modeMsg += "MODE " + cmd.params[1] + " " + modeChanges;
 			if (!modeParams.empty())
 				modeMsg += " " + modeParams;
 			return it->second->sendMessage(NULL, modeMsg, prefix);

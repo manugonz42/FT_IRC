@@ -42,6 +42,21 @@ bool		Channel::isInviteOnly() const
 	return _inviteOnly;
 }
 
+bool		Channel::isKeyProtected() const
+{
+	return !_channelKey.empty();
+}
+
+bool		Channel::isLimited() const
+{
+	return (_limit > 0);
+}
+
+bool		Channel::isTopicRestricted() const
+{
+	return _topicRestriction;
+}
+
 bool		Channel::isOperator(const Client& client) const
 {
 	std::map<std::string, Client *>::const_iterator	it = _operators.find(client.getField("NICK"));
@@ -99,6 +114,38 @@ std::string	Channel::getClients() const
     }
 
 	return userList;
+}
+
+std::string	Channel::getModes() const
+{
+	std::string modes = "";
+	if (isInviteOnly())
+		modes += "i";
+	if (isKeyProtected())
+		modes += "k";
+	if (isLimited())
+		modes += "l";
+	if (isTopicRestricted())
+		modes += "t";
+	
+	return modes;
+}
+
+std::string Channel::getParameters() const
+{
+	std::string parameters = "";
+	std::stringstream ss;
+
+	if (isKeyProtected())
+		parameters += _channelKey;
+	if (isLimited())
+	{
+		if (!parameters.empty()) parameters += " ";
+		ss << _limit;
+		parameters += ss.str();
+	}
+	
+	return parameters;
 }
 
 //////////////////////////////////////////////////////////////////

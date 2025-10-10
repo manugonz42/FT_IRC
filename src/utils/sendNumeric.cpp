@@ -71,7 +71,7 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 				return (0);
 			break;
 		case 461:
-			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " :Not enough parameters"))
+			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + target + " :Not enough parameters"))
 				return (0);
 			break;
 		case 462:
@@ -82,7 +82,10 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			if (!::sendMessage(PREFIX, client->getFd(), "464 " + client->getField("NICK") + " :" + RED + "Password Incorrect" + RESET))
 				return (0);
 			break;
-
+		case 482:
+			if (!::sendMessage(PREFIX, client->getFd(), "482 " + client->getField("NICK") + " :" + target + " :You're not channel operator"))
+				return (0);
+			break;
 		default:
 			break;
 	}
