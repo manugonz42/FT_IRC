@@ -52,7 +52,6 @@ void	signalHandler(int signal)
 {
 	(void)signal;
 	g_exit = 1;
-	std::cout << "\nhola\n";
 }
 
 
