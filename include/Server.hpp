@@ -30,7 +30,6 @@ class Server
 		bool						executeCommand(Client *client, const ParsedCommand &cmd);
 		bool						createChannel(const Client& client, const std::string& name);
 
-
 		bool						executePingPong(Client *client, const ParsedCommand &cmd);
 		bool						executePass(Client *client, const ParsedCommand &cmd);
 		bool						executeCap(Client *client, const ParsedCommand &cmd);
