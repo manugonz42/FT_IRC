@@ -1,25 +1,27 @@
 #include "Ircserv.hpp"
 
-std::string buildRealname(const ParsedCommand &cmd) {
-   
+std::string buildRealname(const ParsedCommand &cmd)
+{
     // Si solo hay 5 parámetros quitar ':' si existe
-    if (cmd.params.size() == 5) {
+    if (cmd.params.size() == 5)
+	{
         if (cmd.params[4][0] == ':')
             return cmd.params[4].substr(1);
         else
             return cmd.params[4];
-    }
+   }
     
     // Concatenar parámetros 4 en adelante en un solo string
     std::string realname = cmd.params[4];
-    for (size_t i = 5; i < cmd.params.size(); i++) {
+    for (size_t i = 5; i < cmd.params.size(); i++)
         realname += " " + cmd.params[i];
-    }
     return realname;
 }
 
-bool    isValidRealname(const std::string &realname) {
-    for (size_t i = 0; i < realname.length(); i++) {
+bool    isValidRealname(const std::string &realname)
+{
+    for (size_t i = 0; i < realname.length(); i++)
+	{
         char c = realname[i];
         if (c == '\0' || c == '\r' || c == '\n')
             return false;
@@ -29,66 +31,47 @@ bool    isValidRealname(const std::string &realname) {
 
 bool    isValidUsername(const std::string &username)
 {
-    if (!isValidLength(username, 1, 510)) // RFC sin limite max, decidir si ponerle
+	// RFC sin limite max, decidir si ponerle
+    if (!isValidLength(username, 1, 510))
         return false;
-    
+
     for (size_t i = 0; i < username.length(); i++)
     {
         char c = username[i];
-        if (c <= 32 || c == 127 || c == '@') // Caracteres no permitidos
+        if (c <= 32 || c == 127 || c == '@')
             return false;
     }
-    
+ 
     return true;
 }
 
 bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
 {
-    // Validar estado del cliente
-    if (client->getLoginStatus() >= REGISTERED)
-    {
-        // Error 462: You may not reregister
-        sendNumeric(client, 462, "");
-        return true;
-    }
+    if (client->getLoginStatus() >= USER_SENT)
+		return (sendNumeric(client, 462, ""));
 
-    // Para el mensaje
     std::string nick = client->getField("NICK");
 
-    // 1. Validar cantidad de parámetros
     if (cmd.params.size() < 5)
-    {
-        // Error 461: Not enough parameters
-        sendNumeric(client, 461, "USER :Not enough parameters");
-        return true;
-    }
+        return (sendNumeric(client, 461, "USER :Not enough parameters"));
 
-    // Validar formato de los parámetros
     if (!isValidUsername(cmd.params[1]))
-    {
-        // Error 461: Invalid username format
-        sendNumeric(client, 461, "USER :Invalid username format");
-        return true;
-    }
+        return (sendNumeric(client, 461, "USER :Invalid username format"));
     if (!isValidRealname(cmd.params[4]))
-    {
-        // Error 461: Invalid realname format
-        sendNumeric(client, 461, "USER :Invalid realname format");
-        return true;
-    }
+        return (sendNumeric(client, 461, "USER :Invalid realname format"));
     
-    std::string username = cmd.params[2];	// Es el 2!!!
-    std::string host = cmd.params[3];		// Es el 3!!!
+    std::string username = cmd.params[1];
+    std::string host = cmd.params[3];
     std::string realname = buildRealname(cmd);
     
-    // Completar registro
     client->setField("USER", username);
     client->setField("HOST", host); // usar DNS reverse?
     client->setField("REAL", realname);
     if (client->getLoginStatus() == NICK_SENT)
     {
         client->setLoginStatus(REGISTERED);
-        sendWelcome(client);
+        if (!sendWelcome(client))
+			return false;
     }
     else
         client->setLoginStatus(USER_SENT);
