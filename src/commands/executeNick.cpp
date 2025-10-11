@@ -29,20 +29,18 @@ bool isValidNickname(const std::string &nick)
     return true;
 }
 
-bool isValidNickCommand(Client *client, const ParsedCommand &cmd)
+int isValidNickCommand(Client *client, const ParsedCommand &cmd)
 {
-    if (cmd.params.empty())
+    if (cmd.params.empty() || cmd.params.size() < 2)
     {
-        sendNumeric(client, 431, ":No nickname given");
-        return false;
+		if (!sendNumeric(client, 431, ":No nickname given"))
+			return (-1);
+		return false;
     }
-    if (cmd.params.size() < 2)
-    {
-        sendNumeric(client, 431, ":No nickname given");
-        return false;
-    }
-    if (cmd.params.size() > 2) {
-        sendNumeric(client, 461, ":Too many parameters");
+    if (cmd.params.size() > 2)
+	{
+        if (!sendNumeric(client, 461, ":Too many parameters"))
+			return (-1);
         return false;
     }
     return true;
@@ -51,15 +49,17 @@ bool isValidNickCommand(Client *client, const ParsedCommand &cmd)
 bool Server::executeNick(Client *client, const ParsedCommand &cmd)
 {
     // 1. Validar cantidad de parámetros
-    if (!isValidNickCommand(client, cmd))
-        return false;
+	int	valid;
+	valid = isValidNickCommand(client, cmd);
+	if (valid == -1)
+		return false;
+    if (!valid)
+        return true;
     
     // 2. Validar formato del nick
     if (!isValidNickname(cmd.params[1]))
-    {
-        sendNumeric(client, 432, cmd.params[1]);
-        return false;
-    }
+        return (sendNumeric(client, 432, cmd.params[1]));
+
     // 3. Verificar si ya está en uso
     std::string upperNick = strToUpper(cmd.params[1]);
 
@@ -74,18 +74,13 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
                 return true; // Mismo cliente, mismo nick, ignorar
             }
             else
-            {
-                // No puede cambiar a un nick ya en uso
-                sendNumeric(client, 433, cmd.params[1]);
-                return false;
-            }
+				return (sendNumeric(client, 433, cmd.params[1]));
+			// No puede cambiar a un nick ya en uso
         }
         else
         {
             // Nick usado durante login
-            // Decidir que hacer--
-            sendNumeric(client, 433, cmd.params[1]);
-            return true;
+            return (sendNumeric(client, 433, cmd.params[1]));
         }
         
         return true;
@@ -100,7 +95,8 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         if (client->getLoginStatus() == USER_SENT)
         {
             client->setLoginStatus(REGISTERED);
-            sendWelcome(client);
+            if (!sendWelcome(client))
+				return false;
             return true;
         }
         client->setLoginStatus(NICK_SENT);
@@ -120,7 +116,8 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         _clientMap[upperNick] = client;     
         
         // Notificar al cliente del cambio
-        ::sendMessage(PREFIX, client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n");
+        if (!::sendMessage(PREFIX, client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n"))
+			return false;
         
         // Notificar a todos los canales del cambio
         //notifyNickChange(client, oldNick, cmd.params[1]);
