@@ -71,18 +71,21 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 				return (0);
 			break;
 		case 461:
-			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " :Not enough parameters"))
+			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " :" + YELLOW + target + RESET))
 				return (0);
 			break;
 		case 462:
-			if (!::sendMessage(PREFIX, client->getFd(), "462 " + client->getField("NICK") + " :Unauthorized command (already registered)"))
+			if (!::sendMessage(PREFIX, client->getFd(), "462 " + client->getField("NICK") + " :You may not reregister"))
 				return (0);
 			break;
 		case 464:
-			if (!::sendMessage(PREFIX, client->getFd(), "464 " + client->getField("NICK") + " :Password Incorrect"))
+			if (!::sendMessage(PREFIX, client->getFd(), "464 " + client->getField("NICK") + " :" + RED + "Password Incorrect" + RESET))
 				return (0);
 			break;
-
+		case 482:
+			if (!::sendMessage(PREFIX, client->getFd(), "482 " + client->getField("NICK") + " :" + target + " :You're not channel operator"))
+				return (0);
+			break;
 		default:
 			break;
 	}

@@ -1,6 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 #include "Ircserv.hpp"
+#include <sstream>
 
 class Channel
 {
@@ -22,6 +23,9 @@ class Channel
 
 		std::string	getName() const;
 		bool		isInviteOnly() const;
+		bool		isTopicRestricted() const;
+		bool		isKeyProtected() const;
+		bool		isLimited() const;
 		bool		isOperator(const Client& client) const;
 		bool		isOperator(const std::string& nick) const;
 		bool		isClient(const Client& client) const;
@@ -29,13 +33,17 @@ class Channel
 		bool		isFull() const;
 		bool		hasPass() const;
 		std::string	getClients() const;
+		std::string	getModes() const;
+		std::string getParameters() const;
 
 		bool		addClient(const Client& client, bool isOperator);
 		bool		removeClient(const std::string& username, const std::string& msg);
 		bool		changeKey(const std::string& key);
+		bool		changeLimit(const std::string& limit);
 		bool		makeOperator(const std::string& nick);
-		bool		inviteOnly();
-		bool		topicRestriction();
+		bool		removeOperator(const std::string& nick);
+		bool		inviteOnly(bool inviteOnly);
+		bool		topicRestriction(bool topicRestriction);
 		bool		sendMessage(Client *client, const std::string& msg, const std::string& prefix) const;
 	};
 

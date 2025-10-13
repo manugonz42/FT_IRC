@@ -8,6 +8,7 @@ bool	Server::executePingPong(Client *client, const ParsedCommand &cmd)
 			return (false);
 		return (true);
 	}
-	::sendMessage(PREFIX, client->getFd(), "PONG " + cmd.params[1]);
+	if (!::sendMessage(PREFIX, client->getFd(), "PONG " + cmd.params[1]))
+		return (false);
 	return (true);
 }

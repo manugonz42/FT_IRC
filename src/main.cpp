@@ -7,7 +7,6 @@ int main(int argc, char **argv)
 		std::cerr << "Usage: " << argv[0] << " <port> <password>" << std::endl;
 		return (1);
 	}
-	
 	Server	server(std::atoi(argv[1]), argv[2]);
 	if (!server.socketInit())
 		return (1);

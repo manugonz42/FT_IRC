@@ -19,15 +19,16 @@ class Server
 		std::vector<Client *>		_clientList;
 		std::map<std::string, Client *>	_clientMap;
 		std::map<std::string, Channel *> _channelMap;
+		std::map<std::string, bool (Server::*)(Client *client, const ParsedCommand &cmd)> _commandMap;
 
 		void						acceptNewClient();
 		void						removeClient(size_t i);
 		void						processClientsInput();
 		void						shutdownClients();
 		bool						processCommand(Client *client, const ParsedCommand &cmd);
-		int							wellcome(Client *client ,const std::string &request);  // Método original mantenido
+		void						fillCommandMap();
+		bool						executeCommand(Client *client, const ParsedCommand &cmd);
 		bool						createChannel(const Client& client, const std::string& name);
-
 
 		bool						executePingPong(Client *client, const ParsedCommand &cmd);
 		bool						executePass(Client *client, const ParsedCommand &cmd);

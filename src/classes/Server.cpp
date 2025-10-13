@@ -1,9 +1,11 @@
 #include "Ircserv.hpp"
+int	g_exit;
 
 Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _password(password)
 {
 	_running = true;
 	_serverName = ":server";
+	fillCommandMap();
 }
 
 Server::~Server()
@@ -14,6 +16,20 @@ Server::~Server()
 		close(_fd);
 		_fd = -1;
 	}
+}
+
+void Server::fillCommandMap()
+{
+	_commandMap["CAP"] = &Server::executeCap;
+	_commandMap["JOIN"] = &Server::executeJoin;
+	_commandMap["PASS"] = &Server::executePass;
+	_commandMap["KICK"] = &Server::executeKick;
+	_commandMap["MODE"] = &Server::executeMode;
+	_commandMap["NICK"] = &Server::executeNick;
+	_commandMap["NOTICE"] = &Server::executeNotice;
+	_commandMap["PING"] = &Server::executePingPong;
+	_commandMap["PRIVMSG"] = &Server::executePrivMsg;
+	_commandMap["USER"] = &Server::executeUser;
 }
 
 int		Server::getFd()
@@ -31,6 +47,13 @@ int		reusePort(int fd)
 	}
 	return (0);
 }
+
+void	signalHandler(int signal)
+{
+	(void)signal;
+	g_exit = 1;
+}
+
 
 //	Prepare the socket and put it into listening mode
 //
@@ -54,7 +77,7 @@ int		reusePort(int fd)
 int		Server::socketInit()
 {
 	struct sockaddr_in addr;
-
+	signal(SIGINT, signalHandler);
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd < 0)
 	{
@@ -105,7 +128,8 @@ void	Server::run()
 	serverPoll.events = POLLIN;
 	serverPoll.revents = 0;
 	_pollFds.push_back(serverPoll);
-	while (_running)
+	g_exit = 0;
+	while (!g_exit)
 	{
 		ready = poll(_pollFds.data(), _pollFds.size(), -1);
 		if (ready < 0)
@@ -119,4 +143,3 @@ void	Server::run()
 		processClientsInput();
 	}
 }
-
