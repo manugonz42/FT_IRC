@@ -39,7 +39,7 @@ int isValidNickCommand(Client *client, const ParsedCommand &cmd)
     }
     if (cmd.params.size() > 2)
 	{
-        if (!sendNumeric(client, 461, ":Too many parameters"))
+        if (!sendNumeric(client, 461, "NICK :Too many parameters"))
 			return (-1);
         return false;
     }
