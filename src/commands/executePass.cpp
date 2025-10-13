@@ -16,10 +16,10 @@ bool	Server::executePass(Client *client, const ParsedCommand &cmd)
 		else
 		{
 			sendNumeric(client, 464, "");
-			return false;
+			return (false);
 		}
 	}
 	else
-		return (sendNumeric(client, 461, ""));
+		return (sendNumeric(client, 461, "PASS :Not enough parameters"));
 	return (true);
 }

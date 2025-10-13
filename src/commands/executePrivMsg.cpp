@@ -4,7 +4,7 @@ static int	commandIsValid(Client *client, const ParsedCommand &cmd)
 {
 	if (cmd.params.size() <= 1)
 	{
-		if (!sendNumeric(client, 461, ""))
+		if (!sendNumeric(client, 461, "PRIVMSG :Not enough parameters"))
 			return (-1);
 		return (0);
 	}
