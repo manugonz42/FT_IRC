@@ -71,7 +71,7 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 				return (0);
 			break;
 		case 461:
-			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " " + target + " :Not enough parameters"))
+			if (!::sendMessage(PREFIX, client->getFd(), "461 " + client->getField("NICK") + " :" + YELLOW + target + RESET))
 				return (0);
 			break;
 		case 462:
