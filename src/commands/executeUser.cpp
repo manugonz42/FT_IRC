@@ -61,7 +61,7 @@ bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
         return (sendNumeric(client, 461, "USER :Invalid realname format"));
     
     std::string username = cmd.params[1];
-    std::string host = cmd.params[3];
+    std::string host = cmd.params[2];
     std::string realname = buildRealname(cmd);
     
     client->setField("USER", username);
