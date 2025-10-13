@@ -77,8 +77,8 @@ bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
         return true;
     }
     
-    std::string username = cmd.params[2];	// Es el 2!!!
-    std::string host = cmd.params[3];		// Es el 3!!!
+    std::string username = cmd.params[1];
+    std::string host = cmd.params[2];
     std::string realname = buildRealname(cmd);
     
     // Completar registro
