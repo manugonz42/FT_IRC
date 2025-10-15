@@ -82,8 +82,10 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 				return false;
 		}
 		else if (!it->second->isInviteOnly() && !it->second->isFull())
+		{
 			if(!it->second->addClient(*client, false))
 				return false;
+		}
 	}
 	return true;
 }
