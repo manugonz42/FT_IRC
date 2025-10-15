@@ -77,11 +77,15 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 		if (it == _channelMap.end())
+		{
 			if(!createChannel(*client, channelName))
 				return false;
-		if (!it->second->isInviteOnly() && !it->second->isFull())
+		}
+		else if (!it->second->isInviteOnly() && !it->second->isFull())
+		{
 			if(!it->second->addClient(*client, false))
 				return false;
+		}
 	}
 	return true;
 }
