@@ -38,6 +38,10 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			if (!::sendMessage(PREFIX, client->getFd(), "401 " + client->getField("NICK") + " :" + target))
 				return (0);
 			break;
+		case 402:
+			if (!::sendMessage(PREFIX, client->getFd(), "402 " + client->getField("NICK") + " :No such server"))
+				return (0);
+			break;
 		case 403:
 			if (!::sendMessage(PREFIX, client->getFd(), "403 " + client->getField("NICK") + " :" + target))
 				return (0);
@@ -84,6 +88,10 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			break;
 		case 482:
 			if (!::sendMessage(PREFIX, client->getFd(), "482 " + client->getField("NICK") + " :" + target + " :You're not channel operator"))
+				return (0);
+			break;
+		case 351:
+			if (!::sendMessage(PREFIX, client->getFd(), "351 " + client->getField("NICK") + " " + target))
 				return (0);
 			break;
 		default:

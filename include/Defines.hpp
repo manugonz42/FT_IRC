@@ -2,6 +2,9 @@
 # define DEFINES_HPP
 
 # define PREFIX ":server "
+# define SERVER_VERSION "1.0"
+# define DEBUGLEVEL "0"
+# define COMMENTS "ft_irc server - 42 School project"
 
 # define VALID_IRC_COMMANDS \
     "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
@@ -17,7 +20,6 @@ enum LoginStatus
     USER_SENT,      // Usuario enviado (NUEVO)
     REGISTERED      // Login completo
 };
-# define VALID_IRC_COMMANDS_COUNT 16
 
 typedef enum e_command
 {
@@ -34,6 +36,10 @@ typedef enum e_command
     PONG,
     VERSION,
     TIME,
+    MODE,
+    KICK,
+    INVITE,
+    TOPICmake
 }	t_command;
 
 #endif
