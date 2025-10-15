@@ -36,8 +36,8 @@ class Channel
 		std::string	getModes() const;
 		std::string getParameters() const;
 
-		bool		addClient(const Client& client, bool isOperator);
-		bool		removeClient(const std::string& username, const std::string& msg);
+		bool		addClient(const Client& client, bool makeOperator);
+		bool		removeClient(const std::string& nick);
 		bool		changeKey(const std::string& key);
 		bool		changeLimit(const std::string& limit);
 		bool		makeOperator(const std::string& nick);

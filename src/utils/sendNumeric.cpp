@@ -66,6 +66,14 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			if (!::sendMessage(PREFIX, client->getFd(), "433 " + client->getField("NICK") + " " + target + " :Nickname is already in use"))
 				return (0);
 			break;
+		case 441:
+			if (!::sendMessage(PREFIX, client->getFd(), "441 " + client->getField("NICK") + " " + target + " :They aren't on that channel"))
+				return (0);
+			break;
+		case 442:
+			if (!::sendMessage(PREFIX, client->getFd(), "442 " + client->getField("NICK") + " " + target + " :You're not on that channel"))
+				return (0);
+			break;
 		case 451:
 			if (!::sendMessage(PREFIX, client->getFd(), "451 " + client->getField("NICK") + " :You have not registered"))
 				return (0);

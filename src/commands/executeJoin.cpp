@@ -63,12 +63,12 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 	{
 		if (!isValid(channels[i]))
 		{
-			sendNumeric(client, 403, channels[i]);
+			if (!sendNumeric(client, 403, channels[i]))
+				return false;
 			return true;
 		}
 	}
 	
-	// Procesar solo el primer canal (filtro temporal)
 	int	numChannels = channels.size();
 
 	for (int i = 0; i < numChannels; i++)
@@ -77,9 +77,11 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 		if (it == _channelMap.end())
+		{
 			if(!createChannel(*client, channelName))
 				return false;
-		if (!it->second->isInviteOnly() && !it->second->isFull())
+		}
+		else if (!it->second->isInviteOnly() && !it->second->isFull())
 			if(!it->second->addClient(*client, false))
 				return false;
 	}
@@ -89,7 +91,8 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 bool	Server::createChannel(const Client& client, const std::string& name)
 {
 	Channel*	ch = new Channel(name);
-	ch->addClient(client, true);
+	if (!ch->addClient(client, true))
+		return false;
 	_channelMap.insert(std::make_pair(name, ch));
 
 	return true;
