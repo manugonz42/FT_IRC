@@ -31,6 +31,7 @@ bool isValidLength(const std::string &str, size_t minLen, size_t maxLen);
 
 int	sendMessage(std::string prefix, int fd ,const std::string &msg);
 int	sendNumeric(Client *client, int numeric, const std::string &target);
+std::vector<std::string> parseChannels(const std::string& channelParam);
 
 void	signalHandler(int signal);
 #endif

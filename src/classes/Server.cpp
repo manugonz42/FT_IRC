@@ -30,6 +30,7 @@ void Server::fillCommandMap()
 	_commandMap["PING"] = &Server::executePingPong;
 	_commandMap["PRIVMSG"] = &Server::executePrivMsg;
 	_commandMap["USER"] = &Server::executeUser;
+	_commandMap["PART"] = &Server::executePart;
 }
 
 int		Server::getFd()

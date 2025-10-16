@@ -8,7 +8,7 @@ void	Server::removeClient(size_t i)
 	std::string clientNick = _clientList[i]->getField("NICK");
 	std::map<std::string, Channel *>::iterator it = _channelMap.begin();
 	for (;it != _channelMap.end(); it++)
-		it->second->removeClient(clientNick, "");
+		it->second->removeClient(clientNick);
 	_clientMap.erase(strToUpper(clientNick));
 	if (_clientList[i] != NULL)
 		delete _clientList[i];
