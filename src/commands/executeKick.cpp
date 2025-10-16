@@ -28,6 +28,13 @@ bool	Server::executeKick(Client* client, const ParsedCommand& cmd)
 
 	Channel* ch = it->second;
 
+	if (!ch->isClient(*client))
+	{
+		if (!sendNumeric(client, 442, cmd.params[1]))
+			return false;
+		return true;
+	}
+
 	if (!ch->isOperator(*client))
 	{
 		if (!sendNumeric(client, 482, cmd.params[1]))

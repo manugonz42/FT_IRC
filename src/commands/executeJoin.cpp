@@ -5,68 +5,18 @@
 
 
 /*
-	Falta implementar varias funcionalidades de join, pero 
-	debería poder unirse a un canal.
+	Falta implementar unirse con contraseña y solo invitacion
 */
-//
-// DESDE AQUI ------------------------------
-//
-static bool	isValid(const std::string& channel)
-{
-    if (channel.empty() || channel[0] != '#')
-	{
-		std::cout << "Canal inválido: debe comenzar con '#'" << std::endl;
-        return false;
-    }
-	return true;
-}
-
-std::vector<std::string> parseChannels(const std::string& channelParam) {
-    std::vector<std::string> channels;
-    
-    if (channelParam.empty())
-        return channels;
-    
-    std::string current = "";
-    for (size_t i = 0; i < channelParam.length(); ++i) {
-        char c = channelParam[i];
-        
-        if (c == ',') {
-            if (!current.empty()) {
-                channels.push_back(current);
-                current = "";
-            }
-        } else 
-            current += c;
-        
-    }
-
-    if (!current.empty())
-        channels.push_back(current);
-    
-    return channels;
-}
-
+		
 bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 {
-//	cmd[1] = nombre del canal;
-//  revisarlo y decidir si es válido así (prueba del cliente)
-	if (cmd.params.size() < 2 || (cmd.params.size() == 2 && cmd.params[1] == ":"))
-        return true;
-
 	std::vector<std::string> channels = parseChannels(cmd.params[1]);
 	
 	if (channels.empty())
-		return true;
-	// Validar cada canal del vector
-	for (size_t i = 0; i < channels.size(); ++i)
 	{
-		if (!isValid(channels[i]))
-		{
-			if (!sendNumeric(client, 403, channels[i]))
-				return false;
-			return true;
-		}
+		if (!sendNumeric(client, 403, cmd.params[1]))
+			return false;
+		return true;
 	}
 	
 	int	numChannels = channels.size();
@@ -78,7 +28,7 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 		if (it == _channelMap.end())
 		{
-			if(!createChannel(*client, channelName))
+			if (!createChannel(*client, channelName))
 				return false;
 		}
 		else if (!it->second->isInviteOnly() && !it->second->isFull())
