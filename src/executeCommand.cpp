@@ -18,7 +18,7 @@ bool	Server::executeCommand(Client *client, const ParsedCommand &cmd)
 		else if (it->first != "NICK" && it->first != "USER" && it->first != "PASS" && it->first != "CAP" &&  client->getLoginStatus() != REGISTERED)
 		{
 			sendNumeric(client, 451, "");
-			return (true);
+			return (true); //  ????
 		}
 		return ((this->*(it->second))(client, cmd));
 	}

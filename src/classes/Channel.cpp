@@ -265,3 +265,16 @@ bool	Channel::sendMessage(Client *client, const std::string& msg, const std::str
 	return (true);
 }
 
+bool Channel::renameClient(const std::string &oldNick, const std::string &newNick)
+{
+	std::map<std::string, Client *>::iterator it = _clientChannelList.find(oldNick);
+	if (it == _clientChannelList.end())
+		return false;
+	Client *client = it->second;
+	_clientChannelList.erase(it);
+	_clientChannelList[newNick] = client;
+
+	if (_operators.erase(oldNick))
+		_operators[newNick] = client;
+	return true;
+}
