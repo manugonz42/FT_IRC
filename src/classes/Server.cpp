@@ -1,5 +1,6 @@
 #include "Ircserv.hpp"
-int	g_exit;
+// mejor que int, indibilisble, no se puede cortar la modificación
+volatile sig_atomic_t g_exit;
 
 Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _password(password)
 {
@@ -31,6 +32,7 @@ void Server::fillCommandMap()
 	_commandMap["PRIVMSG"] = &Server::executePrivMsg;
 	_commandMap["USER"] = &Server::executeUser;
 	_commandMap["PART"] = &Server::executePart;
+	_commandMap["VERSION"] = &Server::executeVersion;
 }
 
 int		Server::getFd()
@@ -78,7 +80,11 @@ void	signalHandler(int signal)
 int		Server::socketInit()
 {
 	struct sockaddr_in addr;
+	// Manejo de señales
 	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
+	signal(SIGQUIT, signalHandler);
+	signal(SIGPIPE, SIG_IGN); // señal que se recibe al escribir a un socket cerrado abruptamente
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd < 0)
 	{
@@ -135,7 +141,9 @@ void	Server::run()
 		ready = poll(_pollFds.data(), _pollFds.size(), -1);
 		if (ready < 0)
 		{
-			if (errno == EINTR)
+			// añado && !g_exit
+			// si se da el caso que entra aquí despues de recibir la señal saltaría al siguiente loop
+			if (errno == EINTR && !g_exit)
 				continue;
 			std::cerr << "Error: poll failed" << std::endl;
 			break;
