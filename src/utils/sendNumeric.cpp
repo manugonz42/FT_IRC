@@ -20,6 +20,10 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			if (!::sendMessage(PREFIX, client->getFd(), "404 " + client->getField("NICK") + " :" + target))
 				return (0);
 			break;
+		case 409:
+			if (!::sendMessage(PREFIX, client->getFd(), "409 " + client->getField("NICK") + " :No origin specified"))
+				return (0);
+			break;
 		case 411:
 			if (!::sendMessage(PREFIX, client->getFd(), "411 " + client->getField("NICK") + " :No recipient given"))
 				return (0);

@@ -4,7 +4,7 @@
 
 static bool	isValid(const std::string& channel)
 {
-	return (channel.empty() || channel[0] != '#');
+	return (!channel.empty() && channel[0] == '#');
 }
 
 std::vector<std::string> parseChannels(const std::string& channelParam) {

@@ -15,7 +15,7 @@ bool	Server::executeNotice(Client *client, const ParsedCommand &cmd)
 	if (!validCmd)
 		return (true);
 	std::string	text = cmd.params[1] + " " + cmd.params[2];
-	std::string prefix = ":" + client->getField("NICK") + "!" + client->getField("USER") + "@" + /* client->getField("HOST") */"localhost" + " ";
+	std::string prefix = client->getField("PREFIX");
 	if (cmd.params[1][0] == '#')
 	{
 		std::map<std::string, Channel *>::iterator i = _channelMap.find(cmd.params[1]);

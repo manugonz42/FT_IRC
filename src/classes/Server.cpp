@@ -81,10 +81,10 @@ int		Server::socketInit()
 {
 	struct sockaddr_in addr;
 	// Manejo de señales
-	signal(SIGINT, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGPIPE, SIG_IGN); // señal que se recibe al escribir a un socket cerrado abruptamente
+	std::signal(SIGINT, signalHandler);
+	std::signal(SIGTERM, signalHandler);
+	std::signal(SIGQUIT, signalHandler);
+	std::signal(SIGPIPE, SIG_IGN);
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd < 0)
 	{
@@ -143,8 +143,8 @@ void	Server::run()
 		{
 			// añado && !g_exit
 			// si se da el caso que entra aquí despues de recibir la señal saltaría al siguiente loop
-			if (errno == EINTR && !g_exit)
-				continue;
+			if (g_exit)
+				break;
 			std::cerr << "Error: poll failed" << std::endl;
 			break;
 		}
