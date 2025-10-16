@@ -23,5 +23,7 @@ bool Server::sendWelcome(Client *client)
 		<< " fully registered as " << BOLD << MAGENTA << client->getField("NICK") << RESET
 		<< BRIGHT_GREEN << " ✅" << RESET << std::endl;
 
+		client->setPrefix();
+
 		return true;
 }

@@ -11,6 +11,7 @@ class Client
 		std::string	_realname;
 		std::string	_inputBuffer;
 		std::string	_hostname;
+		std::string	_prefix;
 		LoginStatus	_loginStatus;
 		bool		_authenticated;
 
@@ -28,6 +29,7 @@ class Client
 		// Getters y setters
 		void		setLoginStatus(LoginStatus status);
 		LoginStatus	getLoginStatus() const;
+		void		setPrefix(void);
 };
 
 #endif

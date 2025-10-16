@@ -16,17 +16,17 @@ Client::~Client()
 		close (_fd);
 }
 
-int Client::getFd() const
+int			Client::getFd() const
 {
 	return (_fd);
 }
 
-void	Client::appendToBuffer(const char *chunk, size_t bytes)
+void		Client::appendToBuffer(const char *chunk, size_t bytes)
 {
 	_inputBuffer.append(chunk, bytes);
 }
 
-bool	Client::extractedLine(std::string &line)
+bool		Client::extractedLine(std::string &line)
 {
 	size_t	pos;
 	
@@ -38,7 +38,7 @@ bool	Client::extractedLine(std::string &line)
 	return (true);
 }
 
-void	Client::setField(const std::string &type, const std::string &field)
+void		Client::setField(const std::string &type, const std::string &field)
 {
 	if (type == "NICK")
 		_nick = field;
@@ -50,7 +50,7 @@ void	Client::setField(const std::string &type, const std::string &field)
 		_hostname = field;	
 }
 
-std::string		Client::getField(const std::string &type) const
+std::string	Client::getField(const std::string &type) const
 {
 	if (type == "NICK")
 		return (_nick);
@@ -58,11 +58,13 @@ std::string		Client::getField(const std::string &type) const
 		return (_username);
 	else if (type == "REAL")
 		return (_realname);
+	else if (type == "HOST")
+		return (_hostname);
 	else
-		return (_hostname);	
+		return (_prefix);	
 }
 
-bool	Client::isAuthenticated() const
+bool		Client::isAuthenticated() const
 {
 	return (_authenticated);
 }
@@ -71,11 +73,16 @@ void		Client::Authenticate()
 	_authenticated = true;
 }
 
-void	Client::setLoginStatus(LoginStatus status)
+void		Client::setLoginStatus(LoginStatus status)
 {
 	_loginStatus = status;
 }
 LoginStatus	Client::getLoginStatus() const
 {
 	return (_loginStatus);
+}
+
+void		Client::setPrefix(void)
+{
+	_prefix = ":" + _nick + "!" + _username + "@" + _hostname + " ";
 }

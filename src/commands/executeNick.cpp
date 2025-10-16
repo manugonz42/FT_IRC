@@ -107,6 +107,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
     // 5. Cambio de nick después del login
     else
     {
+		std::string	prefix = client->getField("PREFIX");
         std::string oldNick = client->getField("NICK");
         client->setField("NICK", cmd.params[1]);
 
@@ -116,7 +117,7 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
         _clientMap[upperNick] = client;     
         
         // Notificar al cliente del cambio
-        if (!::sendMessage(PREFIX, client->getFd(), ":" + oldNick + " NICK " + cmd.params[1] + "\r\n"))
+        if (!::sendMessage(prefix, client->getFd(), " NICK " + cmd.params[1]))
 			return false;
         
         // Notificar a todos los canales del cambio

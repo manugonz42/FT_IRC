@@ -68,6 +68,7 @@ void	Server::processClientsInput()
 	while (i < _pollFds.size())
 	{
 		size_t	client = i - 1;
+		bool clientRemoved = false;
 		short	revents = _pollFds[i].revents;
 		if (revents & (POLLERR | POLLHUP | POLLNVAL))
         {
@@ -85,32 +86,37 @@ void	Server::processClientsInput()
 				std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
 				_pollFds.erase(_pollFds.begin() + i);
 				removeClient(client);
+				clientRemoved = true;
 				continue;
 			}
-			buffer[bytes] = '\0';
-			_clientList[client]->appendToBuffer(buffer, bytes);
-			while (_clientList[client]->extractedLine(line))
+			else
 			{
-				ParsedCommand cmd = Parser::parse(line);
-				
-				if (!cmd.isValid)
+				_clientList[client]->appendToBuffer(buffer, bytes);
+				while (_clientList[client]->extractedLine(line))
 				{
-					std::cout << "Invalid message from client[" << _clientList[client]->getFd() << "]: " << line << std::endl;
-					continue;
-				}
-				std::cout << "Client[" << _clientList[client]->getFd() << "] -> " << cmd.command;
-				if (!cmd.params.empty())
-					std::cout << " (params: " << cmd.params.size() << ")";
-				std::cout << std::endl;
-				if (!executeCommand(_clientList[client], cmd))
-				{
-					std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
-					_pollFds.erase(_pollFds.begin() + i);
-					removeClient(client);
-					break;
+					ParsedCommand cmd = Parser::parse(line);
+					
+					if (!cmd.isValid)
+					{
+						std::cout << "Invalid message from client[" << _clientList[client]->getFd() << "]: " << line << std::endl;
+						continue;
+					}
+					std::cout << "Client[" << _clientList[client]->getFd() << "] -> " << cmd.command;
+					if (!cmd.params.empty())
+						std::cout << " (params: " << cmd.params.size() << ")" << std::endl;
+					if (!executeCommand(_clientList[client], cmd))
+					{
+						std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
+						_pollFds.erase(_pollFds.begin() + i);
+						removeClient(client);
+						clientRemoved = true;
+						break;
+					}
 				}
 			}
 		}
+		if (clientRemoved)
+			continue;    
 		_pollFds[i].revents = 0;
 		i++;
 	}
