@@ -42,6 +42,7 @@ int isValidNickCommand(Client *client, const ParsedCommand &cmd)
 	return true;
 }
 
+
 bool Server::executeNick(Client *client, const ParsedCommand &cmd)
 {
 	int	valid;
@@ -98,23 +99,24 @@ bool Server::executeNick(Client *client, const ParsedCommand &cmd)
 		std::string	prefix = client->getField("PREFIX");
 		std::string oldNick = client->getField("NICK");
 		client->setField("NICK", cmd.params[1]);
-		client->setPrefix();
 		std::string oldUpperNick = strToUpper(oldNick);
 		_clientMap.erase(oldUpperNick);     
 		_clientMap[upperNick] = client;     
 		
 		if (!::sendMessage(prefix, client->getFd(), "NICK " + cmd.params[1]))
 			return false;
-
 		for (std::map<std::string, Channel *>::iterator it = _channelMap.begin();
 			it != _channelMap.end(); ++it)
 		{
 			Channel *channel = it->second;
-			if (channel->isClient(client->getField("NICK")))
+			if (channel->isClient(oldNick))
 			{
 				channel->renameClient(oldNick, client->getField("NICK"));
 			}
 		}
+		if (!notifyToAllChannels(prefix, client, "NICK " + cmd.params[1]))
+			return (false);
+		client->setPrefix();
 		return true;
 	}
 }

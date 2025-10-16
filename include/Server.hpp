@@ -48,6 +48,7 @@ class Server
 		bool						executeMode(Client *client, const ParsedCommand &cmd);
 		//bool						executeWhois(Client *client, const ParsedCommand &cmd);
 		bool						sendWelcome(Client *client);
+		bool						notifyToAllChannels(const std::string prefix, Client *client, const std::string msg);
 	public:
 		Server(int port, const std::string &password);
 		~Server();
@@ -57,3 +58,4 @@ class Server
 };
 
 #endif
+

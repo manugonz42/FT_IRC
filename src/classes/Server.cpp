@@ -152,3 +152,31 @@ void	Server::run()
 		processClientsInput();
 	}
 }
+
+bool	Server::notifyToAllChannels(const std::string prefix, Client *client, const std::string msg)
+{
+	std::set<Client*> recipients;
+	for (std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+		it != _channelMap.end(); ++it)
+	{
+		Channel *channel = it->second;
+		if (channel->isClient(client->getField("NICK")))
+		{
+			std::map<std::string, Client *>::iterator itClients = _clientMap.begin();
+			std::map<std::string, Client *>::iterator itClientsEnd = _clientMap.end();
+			for (; itClients != itClientsEnd; ++itClients)
+			{
+				Client *toSend = itClients->second;
+				if (channel->isClient(toSend->getField("NICK")) && toSend != client)
+					recipients.insert(toSend);
+			}
+		}
+	}
+	for (std::set<Client *>::iterator it = recipients.begin();
+		it != recipients.end(); ++it)
+	{
+		if (!::sendMessage(prefix, (*it)->getFd(), msg))
+			return (false);
+	}
+	return (true);
+}

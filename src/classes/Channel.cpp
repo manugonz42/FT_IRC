@@ -269,5 +269,6 @@ bool Channel::renameClient(const std::string &oldNick, const std::string &newNic
 
 	if (_operators.erase(oldNick))
 		_operators[newNick] = client;
+
 	return true;
 }
