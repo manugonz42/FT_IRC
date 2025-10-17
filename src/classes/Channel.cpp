@@ -158,23 +158,25 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
 {
 	std::string channelName = getName();
 	std::string nick = client.getField("NICK");	
-		
+	
 	_clientChannelList[nick] = const_cast<Client *>(&client);
 	if (makeOperator)
 		_operators[nick] = const_cast<Client *>(&client);
-		
+	
 	// 1. Confirmar JOIN al cliente
-	std::string joinMsg = nick + "!user@host JOIN " + channelName;
-	if (!this->sendMessage(NULL, joinMsg, ":"))
+	std::string joinMsg = " JOIN " + channelName;
+	if (!this->sendMessage(NULL, joinMsg, client.getField("PREFIX")))
 		return false;
 		
 	// 2. Enviar lista de usuarios (RPL_NAMREPLY)
 	std::string namesMsg = "353 " + nick + " = " + channelName + " :" + getClients();
-	::sendMessage(":server " , client.getFd(), namesMsg);
+	if(!::sendMessage(PREFIX , client.getFd(), namesMsg))
+		return false;
 		
 	// 3. Fin de la lista (RPL_ENDOFNAMES)
 	std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
-	::sendMessage(":server ", client.getFd(), endMsg);
+	if (!::sendMessage(PREFIX, client.getFd(), endMsg))
+		return false;
 
 	return true;
 }

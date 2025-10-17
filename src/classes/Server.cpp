@@ -33,6 +33,7 @@ void Server::fillCommandMap()
 	_commandMap["USER"] = &Server::executeUser;
 	_commandMap["PART"] = &Server::executePart;
 	_commandMap["VERSION"] = &Server::executeVersion;
+	_commandMap["QUIT"] = &Server::executeQuit;
 }
 
 int		Server::getFd()
@@ -177,6 +178,21 @@ bool	Server::notifyToAllChannels(const std::string prefix, Client *client, const
 	{
 		if (!::sendMessage(prefix, (*it)->getFd(), msg))
 			return (false);
+	}
+	return (true);
+}
+bool	Server::removeClientFromChannels(Client *client)
+{
+	std::string clientNick = client->getField("NICK");
+	for (std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+		it != _channelMap.end(); ++it)
+	{
+		Channel *channel = it->second;
+		if (channel->isClient(client->getField("NICK")))
+		{
+			channel->removeClient(clientNick);
+			channel->removeOperator(clientNick);
+		}
 	}
 	return (true);
 }

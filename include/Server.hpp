@@ -49,6 +49,7 @@ class Server
 		//bool						executeWhois(Client *client, const ParsedCommand &cmd);
 		bool						sendWelcome(Client *client);
 		bool						notifyToAllChannels(const std::string prefix, Client *client, const std::string msg);
+		bool						removeClientFromChannels(Client *client);					
 	public:
 		Server(int port, const std::string &password);
 		~Server();
