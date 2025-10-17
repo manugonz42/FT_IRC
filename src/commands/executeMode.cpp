@@ -34,7 +34,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 	int	numParams = cmd.params.size();
 	if (numParams < 2)
 	{
-		if (!sendNumeric(client, 461, "MODE"))
+		if (!sendNumeric(client, 461, "MODE :Not enough parameters"))
 			return false;
 		return true;
 	}
@@ -58,9 +58,9 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 			modeMsg += "324 " + client->getField("NICK") + " " + it->second->getName() + " +";
 			std::string modes = it->second->getModes();
 			if (!modes.empty()) modeMsg += modes;
-			std::string parameters = it->second->getParameters();
+				std::string parameters = it->second->getParameters();
 			if (!parameters.empty()) modeMsg += " " + parameters;
-			return ::sendMessage(prefix, client->getFd(), modeMsg); 	
+				return ::sendMessage(prefix, client->getFd(), modeMsg); 	
 		}
 
 		int	requiredParams = countRequiredParams(cmd.params[2]);
@@ -75,7 +75,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 
 		if (availableParams < requiredParams)
 		{
-			if (!sendNumeric(client, 461, "MODE"))
+			if (!sendNumeric(client, 461, "MODE :Not enough parameters"))
 				return false;
 			return true;
 		}
@@ -107,7 +107,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 						{
 							modeChanges += c;
 							if (!modeParams.empty()) modeParams += " ";
-							modeParams += cmd.params[paramIt];
+								modeParams += cmd.params[paramIt];
 						}
 					}
 					else
@@ -116,7 +116,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 						{
 							modeChanges += c;
 							if (!modeParams.empty()) modeParams += " ";
-							modeParams += cmd.params[paramIt];
+								modeParams += cmd.params[paramIt];
 						}
 					}
 						paramIt++;
@@ -127,7 +127,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 					{
 						it->second->changeKey(cmd.params[paramIt]);
 						if (!modeParams.empty()) modeParams += " ";
-						modeParams += cmd.params[paramIt];
+							modeParams += cmd.params[paramIt];
 						paramIt++;
 					}
 					else
@@ -140,7 +140,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 					{
 						it->second->changeLimit(cmd.params[paramIt]);
 						if (!modeParams.empty()) modeParams += " ";
-						modeParams += cmd.params[paramIt];
+							modeParams += cmd.params[paramIt];
 						paramIt++;
 					}
 					else
@@ -177,8 +177,6 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 	}
 	else
 	{
-		//mode personal
-		(void)client;
 	}
 	
 	return true;

@@ -12,11 +12,11 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 {
 	if (!isValid(cmd))
 	{
-		if (!sendNumeric(client, 461, "PART"))
+		if (!sendNumeric(client, 461, "PART :Invalid number of paramaters"))
 			return false;
 		return true;
 	}
-
+	
 	std::vector<std::string> channels = parseChannels(cmd.params[1]);
 	
 	if (channels.empty())
@@ -35,7 +35,7 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 		if (it == _channelMap.end())
 		{
-			if (!sendNumeric(client, 461, "PART"))
+			if (!sendNumeric(client, 403, channelName))
 				return false;
 		}
 		else
@@ -47,7 +47,7 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 			}
 			else
 			{
-				std::string	partPrefix = ":" + client->getField("NICK") + "!user@host ";
+				std::string	partPrefix = client->getField("PREFIX");
 				std::string partMsg = "PART " + channelName;
 				if (cmd.params.size() > 2)
 					partMsg += " :" + cmd.params[2];

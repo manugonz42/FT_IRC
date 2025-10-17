@@ -14,7 +14,7 @@ bool	Server::executeKick(Client* client, const ParsedCommand& cmd)
 {
 	if (!isValid(cmd))
 	{
-		if (!sendNumeric(client, 461, "KICK"))
+		if (!sendNumeric(client, 461, "KICK :Invalid number of parameters"))
 			return false;
 		return true;
 	}
@@ -48,8 +48,8 @@ bool	Server::executeKick(Client* client, const ParsedCommand& cmd)
 			return false;
 		return true;
 	}
-	std::string	kickPrefix = ":" + client->getField("NICK") + "!user@host ";
-	std::string kickMsg = "KICK " + cmd.params[1] + " " + cmd.params[2] + " :" + cmd.params[3];
+	std::string	kickPrefix = client->getField("PREFIX");
+	std::string kickMsg = "KICK " + cmd.params[1] + " " + cmd.params[2] + cmd.params[3];
 	if(!ch->sendMessage(NULL, kickMsg, kickPrefix))
 		return false;
 	ch->removeClient(cmd.params[2]);

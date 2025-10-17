@@ -16,6 +16,7 @@
 # include <cstdlib>
 # include <fcntl.h>
 # include <map>
+# include <set>
 # include "Colors.hpp"
 # include "Defines.hpp"
 # include "Structures.hpp"

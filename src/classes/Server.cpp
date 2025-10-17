@@ -1,5 +1,6 @@
 #include "Ircserv.hpp"
-int	g_exit;
+// mejor que int, indibilisble, no se puede cortar la modificación
+volatile sig_atomic_t g_exit;
 
 Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _password(password)
 {
@@ -37,6 +38,8 @@ void Server::fillCommandMap()
 	_commandMap["PRIVMSG"] = &Server::executePrivMsg;
 	_commandMap["USER"] = &Server::executeUser;
 	_commandMap["PART"] = &Server::executePart;
+	_commandMap["VERSION"] = &Server::executeVersion;
+	_commandMap["QUIT"] = &Server::executeQuit;
 }
 
 int		Server::getFd()
@@ -84,7 +87,11 @@ void	signalHandler(int signal)
 int		Server::socketInit()
 {
 	struct sockaddr_in addr;
-	signal(SIGINT, signalHandler);
+	// Manejo de señales
+	std::signal(SIGINT, signalHandler);
+	std::signal(SIGTERM, signalHandler);
+	std::signal(SIGQUIT, signalHandler);
+	std::signal(SIGPIPE, SIG_IGN);
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd < 0)
 	{
@@ -141,12 +148,54 @@ void	Server::run()
 		ready = poll(_pollFds.data(), _pollFds.size(), -1);
 		if (ready < 0)
 		{
-			if (errno == EINTR)
-				continue;
+			// añado && !g_exit
+			// si se da el caso que entra aquí despues de recibir la señal saltaría al siguiente loop
+			if (g_exit)
+				break;
 			std::cerr << "Error: poll failed" << std::endl;
 			break;
 		}
 		acceptNewClient();
 		processClientsInput();
 	}
+}
+
+bool	Server::notifyToAllChannels(const std::string prefix, Client *client, const std::string msg)
+{
+	std::set<Client*> recipients;
+	for (std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+		it != _channelMap.end(); ++it)
+	{
+		Channel *channel = it->second;
+		if (channel->isClient(client->getField("NICK")))
+		{
+			std::map<std::string, Client *>::iterator itClients = _clientMap.begin();
+			std::map<std::string, Client *>::iterator itClientsEnd = _clientMap.end();
+			for (; itClients != itClientsEnd; ++itClients)
+			{
+				Client *toSend = itClients->second;
+				if (channel->isClient(toSend->getField("NICK")) && toSend != client)
+					recipients.insert(toSend);
+			}
+		}
+	}
+	for (std::set<Client *>::iterator it = recipients.begin();
+		it != recipients.end(); ++it)
+	{
+		if (!::sendMessage(prefix, (*it)->getFd(), msg))
+			return (false);
+	}
+	return (true);
+}
+bool	Server::removeClientFromChannels(Client *client)
+{
+	std::string clientNick = client->getField("NICK");
+	for (std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+		it != _channelMap.end(); ++it)
+	{
+		Channel *channel = it->second;
+		if (channel->isClient(client->getField("NICK")))
+			channel->removeClient(clientNick);
+	}
+	return (true);
 }

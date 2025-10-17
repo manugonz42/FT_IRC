@@ -48,6 +48,7 @@ class Channel
 		bool		inviteOnly(bool inviteOnly);
 		bool		topicRestriction(bool topicRestriction);
 		bool		sendMessage(Client *client, const std::string& msg, const std::string& prefix) const;
+		bool		renameClient(const std::string &oldNick, const std::string &newNick);
 	};
 
 #endif
