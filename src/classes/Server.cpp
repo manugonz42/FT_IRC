@@ -189,10 +189,7 @@ bool	Server::removeClientFromChannels(Client *client)
 	{
 		Channel *channel = it->second;
 		if (channel->isClient(client->getField("NICK")))
-		{
 			channel->removeClient(clientNick);
-			channel->removeOperator(clientNick);
-		}
 	}
 	return (true);
 }
