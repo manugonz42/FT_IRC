@@ -14,7 +14,7 @@ Channel::Channel()
 Channel::Channel(const std::string& name)
 {
 	_name = name;
-	_topic = "";
+	_topic = "Bienvenidos al canal " + name;
 	_channelKey = "";
 	_limit = 0;
 	_inviteOnly = false;
@@ -86,18 +86,12 @@ bool		Channel::isClient(const std::string& nick) const
 
 bool		Channel::isInvited(const Client& client) const
 {
-	std::map<std::string, Client *>::const_iterator	it = _whiteList.find(client.getField("NICK"));
-	if (it == _whiteList.end())
-		return false;
-	return true;
+	return _whiteList.find(client.getField("NICK")) != _whiteList.end();
 }
 
 bool		Channel::isBanned(const Client& client) const
 {
-	std::map<std::string, Client *>::const_iterator	it = _blackList.find(client.getField("NICK"));
-	if (it == _blackList.end())
-		return false;
-	return true;
+	return _blackList.find(client.getField("NICK")) != _blackList.end();
 }
 
 bool		Channel::isFull() const
@@ -166,6 +160,11 @@ std::string Channel::getParameters() const
 	return parameters;
 }
 
+std::string	Channel::getTopic() const
+{
+	return _topic;
+}
+
 //////////////////////////////////////////////////////////////////
 //																//
 //							Member Functions					//
@@ -205,9 +204,13 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
 bool	Channel::inviteClient(Client* client)
 {
 	std::string nick = client->getField("NICK");
-	if (_whiteList.find(nick) != _whiteList.end())
-		return true;
-	_whiteList[nick] = client;
+	_whiteList.insert(nick);
+	return true;
+}
+
+bool	Channel::bannClient(const std::string& nick)
+{
+	_blackList.insert(nick);
 	return true;
 }
 
@@ -254,6 +257,15 @@ bool	Channel::changeLimit(const std::string& limit)
 		return false;
 		
 	_limit = newLimit;
+	return true;
+}
+
+bool	Channel::setTopic(const std::string& topic)
+{
+	if (topic == ":")
+		_topic = "";
+	else
+		_topic = topic;
 	return true;
 }
 

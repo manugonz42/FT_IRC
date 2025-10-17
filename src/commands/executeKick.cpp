@@ -53,5 +53,6 @@ bool	Server::executeKick(Client* client, const ParsedCommand& cmd)
 	if(!ch->sendMessage(NULL, kickMsg, kickPrefix))
 		return false;
 	ch->removeClient(cmd.params[2]);
+	ch->bannClient(cmd.params[2]);
 	return true;
 }

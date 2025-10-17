@@ -41,6 +41,7 @@ void Server::fillCommandMap()
 	_commandMap["VERSION"] = &Server::executeVersion;
 	_commandMap["QUIT"] = &Server::executeQuit;
 	_commandMap["INVITE"] = &Server::executeInvite;
+	_commandMap["TOPIC"] = &Server::executeTopic;
 }
 
 int		Server::getFd()

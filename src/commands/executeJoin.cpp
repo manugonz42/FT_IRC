@@ -8,7 +8,7 @@
 	Falta implementar unirse con contraseña y solo invitacion
 */
 
-std::vector<std::string> parseKeys(const std::string& param) {
+static std::vector<std::string> parseKeys(const std::string& param) {
 	std::vector<std::string> keys;
 		
 	if (param.empty())
@@ -80,14 +80,6 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 				continue;
 			}
 
-			//Verificar si esta baneado
-			if (channel->isBanned(*client))
-			{
-				if (!sendNumeric(client, 474, channelName))
-					return false;
-				continue;
-			}
-
 			//Verificar si esta lleno
 			if (channel->isFull())
 			{
@@ -111,6 +103,14 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 					return false;
 				continue;
 			}
+
+			//Verificar si esta baneado
+			if (channel->isBanned(*client))
+			{
+				if (!sendNumeric(client, 474, channelName))
+					return false;
+				continue;
+			}
 			
 			if (!channel->addClient(*client, false))
 				return false;
@@ -122,9 +122,11 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 bool	Server::createChannel(const Client& client, const std::string& name)
 {
 	Channel*	ch = new Channel(name);
-	if (!ch->addClient(client, true))
-		return false;
-	_channelMap.insert(std::make_pair(name, ch));
-
+	if (ch)
+	{
+		if (!ch->addClient(client, true))
+			return false;
+		_channelMap.insert(std::make_pair(name, ch));
+	}
 	return true;
 }

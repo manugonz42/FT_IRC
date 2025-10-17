@@ -92,6 +92,14 @@ int	sendNumeric(Client *client, int numeric, const std::string &target)
 			if (!::sendMessage(PREFIX, client->getFd(), "482 " + client->getField("NICK") + " :" + target + " :You're not channel operator"))
 				return (0);
 			break;
+		case 331:
+			if (!::sendMessage(PREFIX, client->getFd(), "331 " + client->getField("NICK") + " " + target))
+				return (0);
+			break;
+		case 332:
+			if (!::sendMessage(PREFIX, client->getFd(), "332 " + client->getField("NICK") + " " + target))
+				return (0);
+			break;
 		case 341:
 			if (!::sendMessage(PREFIX, client->getFd(), "341 " + client->getField("NICK") + " " + target))
 				return (0);
