@@ -49,7 +49,7 @@ bool	Server::executeKick(Client* client, const ParsedCommand& cmd)
 		return true;
 	}
 	std::string	kickPrefix = client->getField("PREFIX");
-	std::string kickMsg = "KICK " + cmd.params[1] + " " + cmd.params[2] + cmd.params[3];
+	std::string kickMsg = "KICK " + cmd.params[1] + " " + cmd.params[2] + " " + cmd.params[3];
 	if(!ch->sendMessage(NULL, kickMsg, kickPrefix))
 		return false;
 	ch->removeClient(cmd.params[2]);

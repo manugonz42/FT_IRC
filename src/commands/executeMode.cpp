@@ -144,7 +144,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 						paramIt++;
 					}
 					else
-						it->second->changeLimit("0");
+						it->second->changeLimit("");
 
 					break;
 				case 'i':

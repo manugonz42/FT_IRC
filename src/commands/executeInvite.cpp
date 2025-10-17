@@ -12,14 +12,16 @@ bool	Server::executeInvite(Client *client, const ParsedCommand &cmd)
 {
 	if (!isValid(cmd))
 	{
-		//error parametros no validos 461
+		if (!sendNumeric(client, 461, "KICK :Invalid parameters"))
+			return false;
 		return true;
 	}
 
 	std::map<std::string, Channel*>::iterator itChannel = _channelMap.find(cmd.params[2]);
 	if (itChannel == _channelMap.end())
 	{
-		//error no existe el canal 403
+		if (!sendNumeric(client, 403, cmd.params[2]))
+			return false;
 		return true;
 	}
 
@@ -27,26 +29,33 @@ bool	Server::executeInvite(Client *client, const ParsedCommand &cmd)
 	
 	if (!ch->isOperator(*client))
 	{
-		//error no eres operador 482
+		if (!sendNumeric(client, 482, cmd.params[2]))
+			return false;
 		return true;
 	}
 
 	if (ch->isClient(cmd.params[1]))
 	{
-		//error ya es un cliente del canal 443
+		if (!sendNumeric(client, 443, cmd.params[1] + " " + cmd.params[2]))
+			return false;
 		return true;
 	}
 
-	std::map<std::string, Client*>::iterator itCliente = _clientMap.find(cmd.params[1]);
+	std::map<std::string, Client*>::iterator itCliente = this->_clientMap.find(strToUpper(cmd.params[1]));
 	if (itCliente == _clientMap.end())
 	{
-		//error usuario no existe 401
+		if (!sendNumeric(client, 401, cmd.params[1]))
+			return false;
 		return true;
 	}
 
 	ch->inviteClient(itCliente->second);
 
-	//mensaje de invitacion al cliente destino
+	std::string	sendMsg = "INVITE " + cmd.params[1] + " " + cmd.params[2];
+	if(!::sendMessage(client->getField("PREFIX"), itCliente->second->getFd(), sendMsg))
+		return false;
+	if (!sendNumeric(client, 341, cmd.params[1] + " " + cmd.params[2]))
+		return false;
 
 	return true;
 }

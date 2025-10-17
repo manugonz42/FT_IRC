@@ -42,11 +42,6 @@ bool		Channel::isInviteOnly() const
 	return _inviteOnly;
 }
 
-bool		Channel::isKeyProtected() const
-{
-	return !_channelKey.empty();
-}
-
 bool		Channel::isLimited() const
 {
 	return (_limit > 0);
@@ -89,8 +84,26 @@ bool		Channel::isClient(const std::string& nick) const
 	return true;
 }
 
+bool		Channel::isInvited(const Client& client) const
+{
+	std::map<std::string, Client *>::const_iterator	it = _whiteList.find(client.getField("NICK"));
+	if (it == _whiteList.end())
+		return false;
+	return true;
+}
+
+bool		Channel::isBanned(const Client& client) const
+{
+	std::map<std::string, Client *>::const_iterator	it = _blackList.find(client.getField("NICK"));
+	if (it == _blackList.end())
+		return false;
+	return true;
+}
+
 bool		Channel::isFull() const
 {
+	if (_limit == 0)
+		return false;
 	return _clientChannelList.size() >= _limit;
 }
 
@@ -99,7 +112,7 @@ bool		Channel::isEmpty() const
 	return _clientChannelList.empty();
 }
 
-bool		Channel::hasPass() const
+bool		Channel::hasKey() const
 {
 	return !_channelKey.empty();
 }
@@ -126,7 +139,7 @@ std::string	Channel::getModes() const
 	std::string modes = "";
 	if (isInviteOnly())
 		modes += "i";
-	if (isKeyProtected())
+	if (hasKey())
 		modes += "k";
 	if (isLimited())
 		modes += "l";
@@ -141,7 +154,7 @@ std::string Channel::getParameters() const
 	std::string parameters = "";
 	std::stringstream ss;
 
-	if (isKeyProtected())
+	if (hasKey())
 		parameters += _channelKey;
 	if (isLimited())
 	{
@@ -185,6 +198,7 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
 	if (!::sendMessage(PREFIX, client.getFd(), endMsg))
 		return false;
 
+	std::cout << "Se añade al canal: " + channelName + " al usuario: " + nick << std::endl;
 	return true;
 }
 
@@ -210,9 +224,36 @@ bool	Channel::changeKey(const std::string& key)
 	return true;
 }
 
+bool	Channel::introduceKey(const std::string& key) const
+{
+	return _channelKey == key;
+}
+
 bool	Channel::changeLimit(const std::string& limit)
 {
-	(void) limit;
+	if (limit.empty())
+	{
+		_limit = 0;  // Sin límite
+		return true;
+	}
+		
+	std::stringstream ss(limit);
+	size_t newLimit;
+		
+	// Intentar convertir
+	if (!(ss >> newLimit))
+		return false;  // Conversión falló
+		
+	// Verificar que no queden caracteres sin procesar
+	std::string remainder;
+	if (ss >> remainder)
+		return false;  // Había caracteres no numéricos
+		
+	// Validar rango razonable
+	if (newLimit == 0 || newLimit > 999999)
+		return false;
+		
+	_limit = newLimit;
 	return true;
 }
 
