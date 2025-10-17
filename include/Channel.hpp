@@ -10,6 +10,7 @@ class Channel
 		std::string						_topic;
 		std::string						_channelKey;
 		std::map<std::string, Client*>	_operators;
+		std::map<std::string, Client*>	_whiteList;
 		std::map<std::string, Client*>	_clientChannelList;
 		size_t							_limit;
 		bool							_inviteOnly;
@@ -31,12 +32,14 @@ class Channel
 		bool		isClient(const Client& client) const;
 		bool		isClient(const std::string& nick) const;
 		bool		isFull() const;
+		bool		isEmpty() const;
 		bool		hasPass() const;
 		std::string	getClients() const;
 		std::string	getModes() const;
 		std::string getParameters() const;
 
 		bool		addClient(const Client& client, bool makeOperator);
+		bool		inviteClient(Client* client);
 		bool		removeClient(const std::string& nick);
 		bool		changeKey(const std::string& key);
 		bool		changeLimit(const std::string& limit);

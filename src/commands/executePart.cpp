@@ -48,7 +48,9 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 			else
 			{
 				std::string	partPrefix = ":" + client->getField("NICK") + "!user@host ";
-				std::string partMsg = "PART " + channelName + " :" + cmd.params[2];
+				std::string partMsg = "PART " + channelName;
+				if (cmd.params.size() > 2)
+					partMsg += " :" + cmd.params[2];
 				if(!it->second->sendMessage(NULL, partMsg, partPrefix))
 					return false;
 				it->second->removeClient(client->getField("NICK"));

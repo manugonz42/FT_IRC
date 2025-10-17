@@ -16,7 +16,7 @@ Channel::Channel(const std::string& name)
 	_name = name;
 	_topic = "";
 	_channelKey = "";
-	_limit = 10;
+	_limit = 0;
 	_inviteOnly = false;
 	_topicRestriction = false;
 	
@@ -94,6 +94,11 @@ bool		Channel::isFull() const
 	return _clientChannelList.size() >= _limit;
 }
 
+bool		Channel::isEmpty() const
+{
+	return _clientChannelList.empty();
+}
+
 bool		Channel::hasPass() const
 {
 	return !_channelKey.empty();
@@ -162,7 +167,9 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
 	_clientChannelList[nick] = const_cast<Client *>(&client);
 	if (makeOperator)
 		_operators[nick] = const_cast<Client *>(&client);
-		
+	
+	_whiteList.erase(nick);
+
 	// 1. Confirmar JOIN al cliente
 	std::string joinMsg = nick + "!user@host JOIN " + channelName;
 	if (!this->sendMessage(NULL, joinMsg, ":"))
@@ -179,12 +186,19 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
 	return true;
 }
 
+bool	Channel::inviteClient(Client* client)
+{
+	std::string nick = client->getField("NICK");
+	if (_whiteList.find(nick) != _whiteList.end())
+		return true;
+	_whiteList[nick] = client;
+	return true;
+}
+
 bool	Channel::removeClient(const std::string& nick)
 {
-	std::map<std::string, Client *>::iterator	it = _clientChannelList.find(nick);
-	if (it == _clientChannelList.end())
-		return false;
-	_clientChannelList.erase(it);
+	removeOperator(nick);
+	_clientChannelList.erase(nick);
 	return true;
 }
 
@@ -209,20 +223,12 @@ bool	Channel::makeOperator(const std::string& nick)
 		return false;
 	}
 	this->_operators[nick] = it->second;
-	std::cout << nick << " is now an operator of " << getName();
 	return true;
 }
 
 bool	Channel::removeOperator(const std::string& nick)
 {
-	std::map<std::string, Client *>::iterator	it = _operators.find(nick);
-	if (it == _operators.end())
-	{
-		//error, member is not an operator
-		return false;
-	}
-	_operators.erase(it);
-	std::cout << nick << " is no longer an operator of " << getName();
+	_operators.erase(nick);
 	return true;
 }
 

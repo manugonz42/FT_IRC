@@ -20,11 +20,12 @@ bool	Server::executeJoin(Client *client, const ParsedCommand &cmd)
 	}
 	
 	int	numChannels = channels.size();
-
+	std::cout << numChannels << std::endl;
 	for (int i = 0; i < numChannels; i++)
 	{
+		
 		std::string channelName = channels[i];
-
+		std::cout << channelName << std::endl;
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 		if (it == _channelMap.end())
 		{

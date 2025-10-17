@@ -11,6 +11,12 @@ Server::Server(int port, const std::string &password) : _fd(-1), _port(port), _p
 Server::~Server()
 {
 	shutdownClients();
+	std::map<std::string, Channel*>::iterator it = _channelMap.begin();
+	while (it != _channelMap.end())
+	{
+		delete it->second;
+		_channelMap.erase(it++);
+	}
 	if (_fd > -1)
 	{
 		close(_fd);
