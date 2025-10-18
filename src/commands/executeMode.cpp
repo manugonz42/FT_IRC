@@ -1,7 +1,4 @@
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
-
+#include "Ircserv.hpp"
 
 static int	countRequiredParams(const std::string& modeString)
 {
@@ -28,20 +25,37 @@ static int	countRequiredParams(const std::string& modeString)
 	return paramCount;
 }
 
+static bool	validModes(const std::string& str, std::string& c)
+{
+	static char modes[] = {'+', '-', 'k', 't', 'l', 'o', 'i'};
+
+	int size = str.length();
+	for (int i = 0; i < size; i++)
+	{
+		int j = 0;
+		while (modes[j] && str[i] != modes[j])
+			j++;
+		if (j == 7)
+		{
+			c += str[i];
+			return false;
+		}
+	}
+	return true;
+}
+
 
 bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 {
 	int	numParams = cmd.params.size();
 	if (numParams < 2)
 	{
-		if (!sendNumeric(client, 461, "MODE"))
+		if (!sendNumeric(client, 461, "MODE :Not enough parameters"))
 			return false;
 		return true;
 	}
 	if (cmd.params[1][0] == '#')
-	{
-		//Para futuro saneamiento, hacer estas comprobaciones en una funcion externa
-		
+	{		
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(cmd.params[1]);
 		if (it == _channelMap.end())
 		{
@@ -58,11 +72,19 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 			modeMsg += "324 " + client->getField("NICK") + " " + it->second->getName() + " +";
 			std::string modes = it->second->getModes();
 			if (!modes.empty()) modeMsg += modes;
-			std::string parameters = it->second->getParameters();
+				std::string parameters = it->second->getParameters();
 			if (!parameters.empty()) modeMsg += " " + parameters;
-			return ::sendMessage(prefix, client->getFd(), modeMsg); 	
+				return ::sendMessage(prefix, client->getFd(), modeMsg); 	
 		}
 
+		std::string c = "";
+		if (!validModes(cmd.params[2], c))
+		{
+
+			if(!sendNumeric(client, 472, c))
+				return false;
+			return true;
+		}
 		int	requiredParams = countRequiredParams(cmd.params[2]);
 		int	availableParams = numParams - 3;
 
@@ -75,7 +97,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 
 		if (availableParams < requiredParams)
 		{
-			if (!sendNumeric(client, 461, "MODE"))
+			if (!sendNumeric(client, 461, "MODE :Not enough parameters"))
 				return false;
 			return true;
 		}
@@ -107,7 +129,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 						{
 							modeChanges += c;
 							if (!modeParams.empty()) modeParams += " ";
-							modeParams += cmd.params[paramIt];
+								modeParams += cmd.params[paramIt];
 						}
 					}
 					else
@@ -116,7 +138,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 						{
 							modeChanges += c;
 							if (!modeParams.empty()) modeParams += " ";
-							modeParams += cmd.params[paramIt];
+								modeParams += cmd.params[paramIt];
 						}
 					}
 						paramIt++;
@@ -127,7 +149,7 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 					{
 						it->second->changeKey(cmd.params[paramIt]);
 						if (!modeParams.empty()) modeParams += " ";
-						modeParams += cmd.params[paramIt];
+							modeParams += cmd.params[paramIt];
 						paramIt++;
 					}
 					else
@@ -140,11 +162,11 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 					{
 						it->second->changeLimit(cmd.params[paramIt]);
 						if (!modeParams.empty()) modeParams += " ";
-						modeParams += cmd.params[paramIt];
+							modeParams += cmd.params[paramIt];
 						paramIt++;
 					}
 					else
-						it->second->changeLimit("0");
+						it->second->changeLimit("");
 
 					break;
 				case 'i':
@@ -168,17 +190,14 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 
 		if (!modeChanges.empty())
 		{
-			prefix = ":" + client->getField("NICK") + "!user@host ";
 			modeMsg += "MODE " + cmd.params[1] + " " + modeChanges;
 			if (!modeParams.empty())
 				modeMsg += " " + modeParams;
-			return it->second->sendMessage(NULL, modeMsg, prefix);
+			return it->second->sendMessage(NULL, modeMsg, client->getField("PREFIX"));
 		}
 	}
 	else
 	{
-		//mode personal
-		(void)client;
 	}
 	
 	return true;

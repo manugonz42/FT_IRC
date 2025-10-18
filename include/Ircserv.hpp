@@ -24,7 +24,6 @@
 # include "Channel.hpp"
 # include "Parser.hpp"
 # include "Server.hpp"
-# include "commands.hpp"
 
 std::string strToUpper(const std::string& str);
 bool isValidLength(const std::string &str, size_t minLen, size_t maxLen);

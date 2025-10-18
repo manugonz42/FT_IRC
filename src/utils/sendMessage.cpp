@@ -2,19 +2,9 @@
 
 int	sendMessage(std::string prefix, int fd ,const std::string &msg)
 {
-	/*int error = 0;
-	socklen_t len = sizeof(error);
-	int result = getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len);
-	if (result != 0 || error != 0)
-	{
-		std::cout << "ERROR: Socket is not valid! getsockopt result: " << result << " error result: " << error << std::endl;
-		return false;
-	}
-	else
-		std::cout << "No hay error con el Socket" << std::endl;*/
-	std::string	wire = prefix + msg + "\r\n";
-	std::cout << "Sending : " << "\"" + wire + "\"" << std::endl;
-	if (::send(fd, wire.c_str(), wire.size(), 0) == -1)
+	std::string	str = prefix + msg + "\r\n";
+	std::cout << "Sending : " << "\"" + prefix + msg + "\"" << std::endl;
+	if (::send(fd, str.c_str(), str.size(), 0) == -1)
 	{
 		std::cerr << "Error: send failed" << std::endl;
 		return (0);

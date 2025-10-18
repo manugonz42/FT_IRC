@@ -1,6 +1,4 @@
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
+#include "Ircserv.hpp"
 
 static bool	isValid(const ParsedCommand& cmd)
 {
@@ -12,11 +10,11 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 {
 	if (!isValid(cmd))
 	{
-		if (!sendNumeric(client, 461, "PART"))
+		if (!sendNumeric(client, 461, "PART :Invalid number of paramaters"))
 			return false;
 		return true;
 	}
-
+	
 	std::vector<std::string> channels = parseChannels(cmd.params[1]);
 	
 	if (channels.empty())
@@ -35,23 +33,32 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 		std::map<std::string, Channel *>::iterator	it = _channelMap.find(channelName);
 		if (it == _channelMap.end())
 		{
-			if (!sendNumeric(client, 461, "PART"))
+			if (!sendNumeric(client, 403, channelName))
 				return false;
 		}
 		else
 		{
-			if (!it->second->isClient(*client))
+			Channel*	channel = it->second;
+
+			if (!channel->isClient(*client))
 			{
 				if (!sendNumeric(client, 442, channelName))
 					return false;
 			}
 			else
 			{
-				std::string	partPrefix = ":" + client->getField("NICK") + "!user@host ";
-				std::string partMsg = "PART " + channelName + " :" + cmd.params[2];
-				if(!it->second->sendMessage(NULL, partMsg, partPrefix))
+				std::string	partPrefix = client->getField("PREFIX");
+				std::string partMsg = "PART " + channelName;
+				if (cmd.params.size() > 2)
+					partMsg += " :" + cmd.params[2];
+				if(!channel->sendMessage(NULL, partMsg, partPrefix))
 					return false;
-				it->second->removeClient(client->getField("NICK"));
+				channel->removeClient(client->getField("NICK"));
+				if (channel->isEmpty())
+				{
+					delete channel;
+					_channelMap.erase(it);
+				}
 			}
 		}
 	}

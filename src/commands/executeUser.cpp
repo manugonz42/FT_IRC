@@ -2,7 +2,6 @@
 
 std::string buildRealname(const ParsedCommand &cmd)
 {
-    // Si solo hay 5 parámetros quitar ':' si existe
     if (cmd.params.size() == 5)
 	{
         if (cmd.params[4][0] == ':')
@@ -11,7 +10,6 @@ std::string buildRealname(const ParsedCommand &cmd)
             return cmd.params[4];
    }
     
-    // Concatenar parámetros 4 en adelante en un solo string
     std::string realname = cmd.params[4];
     for (size_t i = 5; i < cmd.params.size(); i++)
         realname += " " + cmd.params[i];
@@ -31,7 +29,6 @@ bool    isValidRealname(const std::string &realname)
 
 bool    isValidUsername(const std::string &username)
 {
-	// RFC sin limite max, decidir si ponerle
     if (!isValidLength(username, 1, 510))
         return false;
 
@@ -65,7 +62,7 @@ bool    Server::executeUser(Client *client, const ParsedCommand &cmd)
     std::string realname = buildRealname(cmd);
     
     client->setField("USER", username);
-    client->setField("HOST", host); // usar DNS reverse?
+    client->setField("HOST", host);
     client->setField("REAL", realname);
     if (client->getLoginStatus() == NICK_SENT)
     {

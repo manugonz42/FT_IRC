@@ -3,7 +3,6 @@
 #include "Ircserv.hpp"
 #include "Channel.hpp"
 
-// Forward declaration para evitar dependencia circular
 struct ParsedCommand;
 class Channel;
 
@@ -11,10 +10,10 @@ class Server
 {
 	private:
 		bool						_running;
-		std::string					_serverName;
+		std::string			_serverName;
 		int							_fd;
-		int							_port;
-		std::string					_password;
+		const int					_port;
+		const std::string			_password;
 		std::vector<struct pollfd>	_pollFds;
 		std::vector<Client *>		_clientList;
 		std::map<std::string, Client *>	_clientMap;
@@ -25,7 +24,6 @@ class Server
 		void						removeClient(size_t i);
 		void						processClientsInput();
 		void						shutdownClients();
-		bool						processCommand(Client *client, const ParsedCommand &cmd);
 		void						fillCommandMap();
 		bool						executeCommand(Client *client, const ParsedCommand &cmd);
 		bool						createChannel(const Client& client, const std::string& name);
@@ -44,16 +42,17 @@ class Server
 		bool						executeNotice(Client *client, const ParsedCommand &cmd);
 		bool						executeQuit(Client *client, const ParsedCommand &cmd);
 		bool						executeVersion(Client *client, const ParsedCommand &cmd);
-		bool						executeTime(Client *client, const ParsedCommand &cmd);
 		bool						executeMode(Client *client, const ParsedCommand &cmd);
-		//bool						executeWhois(Client *client, const ParsedCommand &cmd);
 		bool						sendWelcome(Client *client);
+		bool						notifyToAllChannels(const std::string prefix, Client *client, const std::string msg);
+		bool						removeClientFromChannels(Client *client);					
 	public:
 		Server(int port, const std::string &password);
 		~Server();
-		int							getFd();
+		int							getFd() const;
 		int							socketInit();
 		void						run();
 };
 
 #endif
+

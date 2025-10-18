@@ -14,9 +14,9 @@ Channel::Channel()
 Channel::Channel(const std::string& name)
 {
 	_name = name;
-	_topic = "";
+	_topic = name;
 	_channelKey = "";
-	_limit = 10;
+	_limit = 0;
 	_inviteOnly = false;
 	_topicRestriction = false;
 	
@@ -40,11 +40,6 @@ std::string	Channel::getName() const
 bool		Channel::isInviteOnly() const
 {
 	return _inviteOnly;
-}
-
-bool		Channel::isKeyProtected() const
-{
-	return !_channelKey.empty();
 }
 
 bool		Channel::isLimited() const
@@ -89,12 +84,29 @@ bool		Channel::isClient(const std::string& nick) const
 	return true;
 }
 
+bool		Channel::isInvited(const Client& client) const
+{
+	return _whiteList.find(client.getField("NICK")) != _whiteList.end();
+}
+
+bool		Channel::isBanned(const Client& client) const
+{
+	return _blackList.find(client.getField("NICK")) != _blackList.end();
+}
+
 bool		Channel::isFull() const
 {
+	if (_limit == 0)
+		return false;
 	return _clientChannelList.size() >= _limit;
 }
 
-bool		Channel::hasPass() const
+bool		Channel::isEmpty() const
+{
+	return _clientChannelList.empty();
+}
+
+bool		Channel::hasKey() const
 {
 	return !_channelKey.empty();
 }
@@ -106,7 +118,6 @@ std::string	Channel::getClients() const
 	for (; it != _clientChannelList.end(); ++it)
 	{
 		if (!userList.empty()) userList += " ";
-		// Si es operador, añadir @
 		if (isOperator(it->first))
 			userList += "@" + it->first;
 		else
@@ -121,7 +132,7 @@ std::string	Channel::getModes() const
 	std::string modes = "";
 	if (isInviteOnly())
 		modes += "i";
-	if (isKeyProtected())
+	if (hasKey())
 		modes += "k";
 	if (isLimited())
 		modes += "l";
@@ -136,7 +147,7 @@ std::string Channel::getParameters() const
 	std::string parameters = "";
 	std::stringstream ss;
 
-	if (isKeyProtected())
+	if (hasKey())
 		parameters += _channelKey;
 	if (isLimited())
 	{
@@ -146,6 +157,11 @@ std::string Channel::getParameters() const
 	}
 	
 	return parameters;
+}
+
+std::string	Channel::getTopic() const
+{
+	return _topic;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -158,33 +174,53 @@ bool	Channel::addClient(const Client& client, bool makeOperator)
 {
 	std::string channelName = getName();
 	std::string nick = client.getField("NICK");	
-		
+	
 	_clientChannelList[nick] = const_cast<Client *>(&client);
 	if (makeOperator)
 		_operators[nick] = const_cast<Client *>(&client);
-		
-	// 1. Confirmar JOIN al cliente
-	std::string joinMsg = nick + "!user@host JOIN " + channelName;
-	if (!this->sendMessage(NULL, joinMsg, ":"))
+	
+	_whiteList.erase(nick);
+
+	std::string joinMsg = "JOIN " + channelName;
+	if (!this->sendMessage(NULL, joinMsg, client.getField("PREFIX")))
 		return false;
 		
-	// 2. Enviar lista de usuarios (RPL_NAMREPLY)
 	std::string namesMsg = "353 " + nick + " = " + channelName + " :" + getClients();
-	::sendMessage(":server " , client.getFd(), namesMsg);
+	if(!::sendMessage(PREFIX , client.getFd(), namesMsg))
+		return false;
 		
-	// 3. Fin de la lista (RPL_ENDOFNAMES)
 	std::string endMsg = "366 " + nick + " " + channelName + " :End of /NAMES list";
-	::sendMessage(":server ", client.getFd(), endMsg);
+	if (!::sendMessage(PREFIX, client.getFd(), endMsg))
+		return false;
 
+	return true;
+}
+
+bool	Channel::inviteClient(Client* client)
+{
+	std::string nick = client->getField("NICK");
+	_whiteList.insert(nick);
+	return true;
+}
+
+bool	Channel::bannClient(const std::string& nick)
+{
+	_blackList.insert(nick);
 	return true;
 }
 
 bool	Channel::removeClient(const std::string& nick)
 {
-	std::map<std::string, Client *>::iterator	it = _clientChannelList.find(nick);
-	if (it == _clientChannelList.end())
-		return false;
-	_clientChannelList.erase(it);
+	removeOperator(nick);
+	_clientChannelList.erase(nick);
+	if (_operators.empty() && !isEmpty())
+	{
+		std::string	newOp = _clientChannelList.begin()->first;
+		makeOperator(newOp);
+		std::string	modeMsg = "MODE " + getName() + " +o " + newOp;
+		if (!this->sendMessage(NULL, modeMsg, PREFIX))
+			return false;
+	}
 	return true;
 }
 
@@ -194,9 +230,42 @@ bool	Channel::changeKey(const std::string& key)
 	return true;
 }
 
+bool	Channel::introduceKey(const std::string& key) const
+{
+	return _channelKey == key;
+}
+
 bool	Channel::changeLimit(const std::string& limit)
 {
-	(void) limit;
+	if (limit.empty())
+	{
+		_limit = 0;
+		return true;
+	}
+		
+	std::stringstream ss(limit);
+	size_t newLimit;
+
+	if (!(ss >> newLimit))
+		return false;
+
+	std::string remainder;
+	if (ss >> remainder)
+		return false;
+
+	if (newLimit == 0 || newLimit > 999999)
+		return false;
+		
+	_limit = newLimit;
+	return true;
+}
+
+bool	Channel::setTopic(const std::string& topic)
+{
+	if (topic.empty() || topic == "::")
+		_topic = "";
+	else
+		_topic = topic;
 	return true;
 }
 
@@ -204,25 +273,14 @@ bool	Channel::makeOperator(const std::string& nick)
 {
 	std::map<std::string, Client *>::iterator	it = _clientChannelList.find(nick);
 	if (it == _clientChannelList.end())
-	{
-		//error, cant make an operator as it is not a member
 		return false;
-	}
 	this->_operators[nick] = it->second;
-	std::cout << nick << " is now an operator of " << getName();
 	return true;
 }
 
 bool	Channel::removeOperator(const std::string& nick)
 {
-	std::map<std::string, Client *>::iterator	it = _operators.find(nick);
-	if (it == _operators.end())
-	{
-		//error, member is not an operator
-		return false;
-	}
-	_operators.erase(it);
-	std::cout << nick << " is no longer an operator of " << getName();
+	_operators.erase(nick);
 	return true;
 }
 
@@ -269,5 +327,6 @@ bool Channel::renameClient(const std::string &oldNick, const std::string &newNic
 
 	if (_operators.erase(oldNick))
 		_operators[newNick] = client;
+
 	return true;
 }

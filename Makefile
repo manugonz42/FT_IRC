@@ -1,23 +1,33 @@
 NAME = ircserv
-#src/main.cpp\
-	src/classes/Client.cpp\
-	src/classes/Server.cpp\
-	src/classes/ServerClients.cpp\
-	src/classes/Parser.cpp\
-	src/utils/sendMessage.cpp\
-	src/utils/sendNumeric.cpp\
-	src/classes/Channel.cpp\
-	src/commands/executeJoin.cpp\
-	src/commands/executePrivMsg.cpp\
-# Opción 1: Usar wildcards (automático)
-SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
-
-# SRC_MAIN = src/main.cpp
-# SRC_CLASSES = $(wildcard src/classes/*.cpp)
-# SRC_UTILS = $(wildcard src/utils/*.cpp)
-# SRC_COMMANDS = $(wildcard src/commands/*.cpp)
-# SRC = $(SRC_MAIN) $(SRC_CLASSES) $(SRC_UTILS) $(SRC_COMMANDS)
-#	src/commands/executePingPong.cpp\
+SRC = \
+	src/main.cpp \
+	src/executeCommand.cpp \
+	src/classes/Channel.cpp \
+	src/classes/Client.cpp \
+	src/classes/Parser.cpp \
+	src/classes/ServerClients.cpp \
+	src/classes/Server.cpp \
+	src/commands/executeCap.cpp \
+	src/commands/executeInvite.cpp \
+	src/commands/executeJoin.cpp \
+	src/commands/executeKick.cpp \
+	src/commands/executeMode.cpp \
+	src/commands/executeNick.cpp \
+	src/commands/executeNotice.cpp \
+	src/commands/executePart.cpp \
+	src/commands/executePass.cpp \
+	src/commands/executePingPong.cpp \
+	src/commands/executePrivMsg.cpp \
+	src/commands/executeQuit.cpp \
+	src/commands/executeTopic.cpp \
+	src/commands/executeUser.cpp \
+	src/commands/executeVersion.cpp \
+	src/utils/isValidLength.cpp \
+	src/utils/parseChannels.cpp \
+	src/utils/sendMessage.cpp \
+	src/utils/sendNumeric.cpp \
+	src/utils/sendWellcome.cpp \
+	src/utils/strToUpper.cpp
 
 OBJ = $(SRC:.cpp=.o)
 CC = c++

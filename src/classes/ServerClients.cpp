@@ -47,6 +47,11 @@ void	Server::acceptNewClient()
 		else
 		{
 			Client *newClient = new Client(clientFd);
+			if (!newClient)
+			{
+				close(clientFd);
+				return;
+			}
 			_clientList.push_back(newClient);
 			struct pollfd clientPoll;
 			clientPoll.fd = newClient->getFd();
@@ -71,13 +76,7 @@ void	Server::processClientsInput()
 		bool clientRemoved = false;
 		short	revents = _pollFds[i].revents;
 		if (revents & (POLLERR | POLLHUP | POLLNVAL))
-        {
-           // std::cout << "Client disconnected (error): " << _pollFds[i].fd << std::endl;
-            //_pollFds.erase(_pollFds.begin() + i);
-            //removeClient(client);
-            //continue; // NO incrementar i
 			revents |= POLLIN;
-        }
 		if (revents & POLLIN)
 		{
 			int	bytes = recv(_pollFds[i].fd, buffer, sizeof(buffer) - 1, 0);
@@ -94,16 +93,24 @@ void	Server::processClientsInput()
 				_clientList[client]->appendToBuffer(buffer, bytes);
 				while (_clientList[client]->extractedLine(line))
 				{
+					std::cout << "Client [" << _clientList[client]->getField("NICK") << "]";
+					std::cout << "[" << _clientList[client]->getFd() << "] :" << line << std::endl; 
 					ParsedCommand cmd = Parser::parse(line);
 					
 					if (!cmd.isValid)
 					{
+						if (!_clientList[client]->isAuthenticated())
+						{
+							sendNumeric(_clientList[client], 464, "");
+							std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;
+							_pollFds.erase(_pollFds.begin() + i);
+							removeClient(client);
+							clientRemoved = true;
+							break;
+						}
 						std::cout << "Invalid message from client[" << _clientList[client]->getFd() << "]: " << line << std::endl;
 						continue;
 					}
-					std::cout << "Client[" << _clientList[client]->getFd() << "] -> " << cmd.command;
-					if (!cmd.params.empty())
-						std::cout << " (params: " << cmd.params.size() << ")" << std::endl;
 					if (!executeCommand(_clientList[client], cmd))
 					{
 						std::cout << "Client disconnected: " << _pollFds[i].fd << std::endl;

@@ -7,39 +7,39 @@
 # define COMMENTS "ft_irc server - 42 School project"
 
 # define VALID_IRC_COMMANDS \
-    "CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
-    "PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "TIME", "MODE"
+	"CAP", "PASS", "NICK", "USER", "JOIN", "PART", "KICK", "INVITE", "TOPIC", \
+	"PRIVMSG", "NOTICE", "QUIT", "PING", "VERSION", "MODE"
 
-# define VALID_IRC_COMMANDS_COUNT 16
+# define VALID_IRC_COMMANDS_COUNT 15
 
 enum LoginStatus
 {
-    UNREGISTERED,   // Recién conectado
-    PASS_SENT,      // Contraseña enviada
-    NICK_SENT,      // Nickname enviado  
-    USER_SENT,      // Usuario enviado (NUEVO)
-    REGISTERED      // Login completo
+	UNREGISTERED,
+	PASS_SENT,
+	NICK_SENT,
+	USER_SENT,
+	REGISTERED
 };
 
 typedef enum e_command
 {
 	CAP,
 	PASS,
-    NICK,
-    USER,
-    JOIN,
-    PART,
-    PRIVMSG,
-    NOTICE,
-    QUIT,
-    PING,
-    PONG,
-    VERSION,
-    TIME,
-    MODE,
-    KICK,
-    INVITE,
-    TOPICmake
+	NICK,
+	USER,
+	JOIN,
+	PART,
+	PRIVMSG,
+	NOTICE,
+	QUIT,
+	PING,
+	PONG,
+	VERSION,
+	TIME,
+	MODE,
+	KICK,
+	INVITE,
+	TOPICmake
 }	t_command;
 
 #endif
