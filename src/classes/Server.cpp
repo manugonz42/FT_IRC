@@ -189,8 +189,8 @@ bool	Server::notifyToAllChannels(const std::string prefix, Client *client, const
 bool	Server::removeClientFromChannels(Client *client)
 {
 	std::string clientNick = client->getField("NICK");
-	for (std::map<std::string, Channel *>::iterator it = _channelMap.begin();
-		it != _channelMap.end(); ++it)
+	std::map<std::string, Channel *>::iterator it = _channelMap.begin();
+	while (it != _channelMap.end())
 	{
 		Channel *channel = it->second;
 		if (channel->isClient(client->getField("NICK")))
@@ -198,8 +198,10 @@ bool	Server::removeClientFromChannels(Client *client)
 		if (channel->isEmpty())
 		{
 			delete channel;
-			_channelMap.erase(it);
+			_channelMap.erase(it++);
 		}
+		else
+			it++;
 	}
 	return (true);
 }
