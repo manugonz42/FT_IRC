@@ -34,10 +34,12 @@ bool	Server::executeTopic(Client *client, const ParsedCommand &cmd)
 		return true;
 	}
 
+	std::string	topicMsg = "";
+
 	if (cmd.params.size() == 2)
 	{
 		std::string topic = channel->getTopic();
-		std::string topicMsg = channel->getName() + " :";
+		topicMsg += channel->getName() + " :";
 
 		if (topic.empty())
 		{
@@ -62,6 +64,9 @@ bool	Server::executeTopic(Client *client, const ParsedCommand &cmd)
 			return true;
 		}
 		channel->setTopic(cmd.params[2]);
+		topicMsg += "TOPIC " + cmd.params[1] + " " + channel->getTopic();
+		if (!channel->sendMessage(NULL, topicMsg, client->getField("PREFIX")))
+			return false;
 	}
 	return true;
 }

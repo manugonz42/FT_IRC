@@ -40,7 +40,9 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 		}
 		else
 		{
-			if (!it->second->isClient(*client))
+			Channel*	channel = it->second;
+
+			if (!channel->isClient(*client))
 			{
 				if (!sendNumeric(client, 442, channelName))
 					return false;
@@ -51,9 +53,14 @@ bool	Server::executePart(Client *client, const ParsedCommand &cmd)
 				std::string partMsg = "PART " + channelName;
 				if (cmd.params.size() > 2)
 					partMsg += " :" + cmd.params[2];
-				if(!it->second->sendMessage(NULL, partMsg, partPrefix))
+				if(!channel->sendMessage(NULL, partMsg, partPrefix))
 					return false;
-				it->second->removeClient(client->getField("NICK"));
+				channel->removeClient(client->getField("NICK"));
+				if (channel->isEmpty())
+				{
+					delete channel;
+					_channelMap.erase(it);
+				}
 			}
 		}
 	}

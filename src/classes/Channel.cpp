@@ -218,6 +218,14 @@ bool	Channel::removeClient(const std::string& nick)
 {
 	removeOperator(nick);
 	_clientChannelList.erase(nick);
+	if (_operators.empty() && !isEmpty())
+	{
+		std::string	newOp = _clientChannelList.begin()->first;
+		makeOperator(newOp);
+		std::string	modeMsg = "MODE " + getName() + " +o " + newOp;
+		if (!this->sendMessage(NULL, modeMsg, PREFIX))
+			return false;
+	}
 	return true;
 }
 
@@ -262,7 +270,7 @@ bool	Channel::changeLimit(const std::string& limit)
 
 bool	Channel::setTopic(const std::string& topic)
 {
-	if (topic == ":")
+	if (topic.empty() || topic == "::")
 		_topic = "";
 	else
 		_topic = topic;

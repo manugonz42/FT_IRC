@@ -168,11 +168,10 @@ bool	Server::executeMode(Client *client, const ParsedCommand &cmd)
 
 		if (!modeChanges.empty())
 		{
-			prefix = ":" + client->getField("NICK") + "!user@host ";
 			modeMsg += "MODE " + cmd.params[1] + " " + modeChanges;
 			if (!modeParams.empty())
 				modeMsg += " " + modeParams;
-			return it->second->sendMessage(NULL, modeMsg, prefix);
+			return it->second->sendMessage(NULL, modeMsg, client->getField("PREFIX"));
 		}
 	}
 	else
